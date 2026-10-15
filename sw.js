@@ -1,4 +1,4 @@
-const V = 'mica-demo-20261015113448';
+const V = 'mica-demo-20261015113933';
 const FILES = ["./", "index.html", "manifest.webmanifest", "assets/entry.mp4", "assets/greet.mp4", "assets/icon-180.png", "assets/idle.mp4", "assets/led1.png", "assets/led2.png", "assets/led3.png", "assets/roboto-latin.woff2", "assets/speak.mp4", "assets/think.mp4", "assets/wave-mask.png", "assets/wave.mp4"];
 self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())));

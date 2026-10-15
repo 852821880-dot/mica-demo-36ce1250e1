@@ -178,7 +178,10 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
 .inp:focus-within{border-color:var(--ink)}
 .inp.over{border-color:var(--red)}
 .ops,.rt{display:contents}
-.ib{order:0;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center}
+.pw{position:relative;order:0;flex:none;width:32px;height:32px}
+.pw input[type=file]{position:absolute;left:0;top:0;width:100%;height:100%;opacity:0;font-size:16px;z-index:2;cursor:pointer}
+.pw input[type=file]:disabled{pointer-events:none}
+.ib{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center}
 .ib:disabled{opacity:.4}
 .inp .box{order:1;flex:1;min-width:0;padding:4px 0}
 .sb{order:2;flex:none;width:32px;height:32px;border-radius:50%;background:var(--ink);border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;opacity:.4}
@@ -276,11 +279,10 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
     <div class="inp" id="inp">
       <div class="att" id="att"></div>
       <div class="box"><textarea id="ta" rows="1" maxlength="1000" placeholder="Tell Mica what you are looking for…"></textarea></div>
-      <div class="ops"><button class="ib" id="plus" aria-label="Add" data-ic="add"></button><div class="rt"><span class="cnt" id="cnt">1000/1000</span><button class="sb" id="send" aria-label="Send" data-ic="arrowUp"></button></div></div>
+      <div class="ops"><div class="pw"><button class="ib" id="plus" aria-label="Add" data-ic="add" tabindex="-1"></button><input type="file" id="file" aria-label="Upload images or files" accept=".txt,.md,.csv,.json,.html,.xlsx,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp,.pptx,image/*"></div><div class="rt"><span class="cnt" id="cnt">1000/1000</span><button class="sb" id="send" aria-label="Send" data-ic="arrowUp"></button></div></div>
     </div>
     <div class="disc" id="disc" style="font-size:12px;line-height:18px;color:#888;text-align:center;width:280px">Answers are AI-generated and may contain mistakes</div>
   </div><div class="safe"></div></div>
-  <input type="file" id="file" style="display:none" accept=".txt,.md,.csv,.json,.html,.xlsx,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp,.pptx,image/*">
 </div>
 <div id="toast"></div>
 <div id="picker"><div class="sheet"><h4>Demo scenes</h4><div id="pk"></div></div></div>
@@ -406,8 +408,8 @@ var OKEXT = ['txt', 'md', 'csv', 'json', 'html', 'xlsx', 'docx', 'pdf', 'png', '
 function fmtSize(b){ return b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
 function renderAtt(){
   var host = $('#att'); host.innerHTML = '';
-  if (!S.att) { inp.classList.remove('has-att'); $('#plus').disabled = false; layout(); return; }
-  inp.classList.add('has-att'); $('#plus').disabled = true;
+  if (!S.att) { inp.classList.remove('has-att'); plusOn(!S.quota); layout(); return; }
+  inp.classList.add('has-att'); plusOn(false);
   var a = S.att, x = '<span class="xb" data-x="1">' + ICONS.closeSm + '</span>';
   if (a.kind === 'img') host.innerHTML = '<div class="th2" style="background-image:url(' + a.url + ')">' + x + '</div>';
   else host.innerHTML = '<div class="fc">' + ICONS.pdf + '<div class="nm"><b>' + esc(a.name) + '</b><span>' + esc(a.size) + '</span></div>' + x + '</div>';
@@ -434,7 +436,7 @@ function pickFile(f){
   S.att = { kind:isImg ? 'img' : 'file', name:f.name, size:fmtSize(f.size), url:isImg ? URL.createObjectURL(f) : '' };
   renderAtt(); sync();
 }
-$('#plus').addEventListener('click', function(){ if (S.quota || S.att) return; $('#file').click(); });
+function plusOn(on){ $('#plus').disabled = !on; $('#file').disabled = !on; }
 $('#file').addEventListener('change', function(e){ pickFile(e.target.files[0]); e.target.value = ''; });
 function attBubble(a){ if (!a) return ''; return a.kind === 'img' ? '<div class="th" style="background-image:url(' + a.url + ')"></div>' : '<div class="fc" style="padding-right:12px">' + ICONS.pdf + '<div class="nm"><b>' + esc(a.name) + '</b><span>' + esc(a.size) + '</span></div></div>'; }
 
@@ -618,7 +620,7 @@ async function rfq(){
       var name = base ? base.replace(/^i\s+(need|want|am looking for)\s+(a|an|some)?\s*/i, '').split(/,| with | for /i)[0].replace(/[.。]$/, '').slice(0, 60) : '', det = base ? 'Hello, I am looking for a supplier for ' + base.replace(/^i\s+(need|want|am looking for)\s+(a|an|some)?\s*/i, '').replace(/[.。]$/, '') + '. Please provide your best quote and available options for this product. I look forward to your response and hope we can establish a good business relationship.' : '';
       f.innerHTML = '<div><h3>Your requirement details</h3><p class="hint">Get competitive quotes from verified suppliers at Made-in-China.com by posting your request. All quotes will be sent to your email.</p></div>' +
         '<div class="f"><label><i>*</i>Product name</label><input class="in" id="rf-n" value="' + esc(name) + '" placeholder="e.g. electric bicycle"></div>' +
-        '<div class="f"><label><i>*</i>Detail</label><div class="dt"><button type="button" class="ai" id="rf-ai">' + ICONS.star + 'Regenerate with AI</button><textarea id="rf-d" maxlength="2000" placeholder="Describe what you need">' + esc(det) + '</textarea><div class="bt"><button type="button" class="sug" id="rf-up" style="animation:none">Upload images or files (0/3)</button><span class="cnt2" id="rf-c">0 / 2000</span></div></div></div>' +
+        '<div class="f"><label><i>*</i>Detail</label><div class="dt"><button type="button" class="ai" id="rf-ai">' + ICONS.star + 'Regenerate with AI</button><textarea id="rf-d" maxlength="2000" placeholder="Describe what you need">' + esc(det) + '</textarea><div class="bt"><label class="sug" id="rf-up" style="animation:none;position:relative;overflow:hidden">Upload images or files (0/3)<input type="file" id="rf-fi" accept=".txt,.md,.csv,.json,.html,.xlsx,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp,.pptx,image/*" style="position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:16px"></label><span class="cnt2" id="rf-c">0 / 2000</span></div></div></div>' +
         '<div class="f"><label><i>*</i>Order quantity</label><div class="qty"><input class="in" id="rf-q" inputmode="numeric" value="' + (base ? '20' : '') + '" placeholder="Quantity"><div class="sel"><select id="rf-u"><option>Piece(s)</option><option>Set(s)</option><option>Pair(s)</option></select>' + ICONS.down + '</div></div></div>' +
         '<button type="button" class="pbtn lg" id="rf-s">Submit</button>';
       host.appendChild(f);   // 表单卡是回答气泡的兄弟，宽 343（Figma 453:6448）
@@ -626,7 +628,7 @@ async function rfq(){
       var cnt = function(){ c.textContent = d.value.length + ' / 2000'; }; cnt(); d.addEventListener('input', cnt);
       var VARS = ['Hello, I am looking for a reliable supplier. Please send your best price, MOQ, lead time and sample policy. We plan to place regular orders if quality and delivery meet our needs.', 'Hi, we are sourcing this product for our local market. Could you share detailed specifications, certifications and your best FOB quote? Thank you.'];
       var vi = 0; $('#rf-ai', f).addEventListener('click', function(){ d.value = (name ? 'Hello, I am looking for a supplier for ' + name + '. ' : '') + VARS[vi++ % VARS.length]; cnt(); });
-      $('#rf-up', f).addEventListener('click', function(){ if (upN >= 3) { toast('You can upload up to 3 files'); return; } var fi = document.createElement('input'); fi.type = 'file'; fi.accept = $('#file').accept; fi.onchange = function(){ var x = fi.files[0]; if (!x) return; if (x.size > 5 * 1048576) { toast('File is too large (max 5MB)'); return; } upN++; $('#rf-up', f).textContent = 'Upload images or files (' + upN + '/3)'; }; fi.click(); });
+      $('#rf-fi', f).addEventListener('change', function(e){ var x = e.target.files[0]; e.target.value = ''; if (!x) return; if (upN >= 3) { toast('You can upload up to 3 files'); return; } var ext = (x.name.split('.').pop() || '').toLowerCase(); if (OKEXT.indexOf(ext) < 0 && x.type.indexOf('image/') !== 0) { toast('Unsupported file type'); return; } if (x.size > 5 * 1048576) { toast('File is too large (max 5MB)'); return; } upN++; $('#rf-up', f).firstChild.nodeValue = 'Upload images or files (' + upN + '/3)'; });
       $('#rf-s', f).addEventListener('click', function(){
         var n = $('#rf-n', f), q = $('#rf-q', f), bad = false;
         [n, q].forEach(function(e){ var e0 = !e.value.trim(); e.classList.toggle('err', e0); bad = bad || e0; });
@@ -657,7 +659,7 @@ async function failAnswer(n, again){
 /* 额度：游客用完 */
 function setQuota(on, kind){
   S.quota = on; inp.classList.toggle('quota', on); $('#login').classList.toggle('on', on && kind !== 'user'); ta.style.height = on ? (kind === 'user' ? '72px' : '48px') : '';
-  ta.disabled = on; $('#plus').disabled = on || !!S.att; sendB.classList.remove('on');
+  ta.disabled = on; plusOn(!on && !S.att); sendB.classList.remove('on');
   ta.placeholder = on ? (kind === 'user' ? 'You have reached the limit of 100 conversations in 24 hours. Please try again later.' : 'You have used up your allotted number of conversations, please log in to continue.') : 'Tell Mica what you are looking for…';
   S.quotaKind = kind;
   if (on) { sendB.style.opacity = '.4'; inp.classList.add('multi'); } else { sendB.style.opacity = ''; }
