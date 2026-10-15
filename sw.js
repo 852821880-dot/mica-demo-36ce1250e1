@@ -1,5 +1,5 @@
-const V = 'mica-demo-20261015105241';
-const FILES = ["./", "index.html", "manifest.webmanifest", "assets/entry.mp4", "assets/greet.mp4", "assets/icon-180.png", "assets/idle.mp4", "assets/p1.jpg", "assets/p2.jpg", "assets/p3.jpg", "assets/p4.jpg", "assets/p5.jpg", "assets/p6.jpg", "assets/p7.jpg", "assets/p8.jpg", "assets/p9.jpg", "assets/roboto-latin.woff2", "assets/speak.mp4", "assets/think.mp4", "assets/wave.mp4"];
+const V = 'mica-demo-20261015111012';
+const FILES = ["./", "index.html", "manifest.webmanifest", "assets/entry.mp4", "assets/greet.mp4", "assets/icon-180.png", "assets/idle.mp4", "assets/p1.jpg", "assets/p2.jpg", "assets/p3.jpg", "assets/p4.jpg", "assets/p5.jpg", "assets/p6.jpg", "assets/p7.jpg", "assets/p8.jpg", "assets/p9.jpg", "assets/roboto-latin.woff2", "assets/speak.mp4", "assets/think.mp4", "assets/wave-mask.png", "assets/wave.mp4"];
 self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', e => {
