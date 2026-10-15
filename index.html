@@ -443,17 +443,12 @@ function attBubble(a){ if (!a) return ''; return a.kind === 'img' ? '<div class=
 /* ══ 5. 对话 ══ */
 var WEL = {
   find:{ ic:'search', t:'Help me find a product', d:'Describe it, I’ll match products', a:'find' },
-  best:{ ic:'medal', t:'Show me the Best Selling list', d:'Top picks for what you searched', a:'best' },
-  rfq:{ ic:'purchase', t:'Post a request for quotation', d:'Tell me what you need, I’ll write it up', a:'rfq' },
-  good:{ ic:'search', t:'Yes, they were a good fit', d:'Tell me what you need next', a:'good' },
-  notq:{ ic:'search', t:'Not quite, show me others', d:'Tell me what was missing', a:'notq' },
-  newp:{ ic:'search', t:'I’m sourcing something new', d:'Describe it, I’ll match products', a:'new' },
-  cont:{ ic:'search', t:'Continue with LED flood lights', d:'Pick up where we left off', a:'cont' },
-  fresh:{ ic:'search', t:'Start something new', d:'Describe it, I’ll match products', a:'new' }
+  pop:{ ic:'medal', t:'Show me the Popular Listing', d:'Trending in your region', a:'pop' },
+  rfq:{ ic:'purchase', t:'Post a request for quotation', d:'Tell me what you need, I’ll write it up', a:'rfq' }
 };
-var WEL_FIRST = { h:"Hi, I'm Mica", p:"Your AI Sourcing Guide on Made-in-China.com. Tell me what you're sourcing — the product, quantity, or where you'll use it — and I'll find suppliers that fit.", cards:['find', 'best', 'rfq'] };
+var WEL_FIRST = { h:"Hi, I'm Mica", p:"Your AI Sourcing Guide on Made-in-China.com. Tell me what you're sourcing — the product, quantity, or where you'll use it — and I'll find suppliers that fit.", cards:['find', 'pop', 'rfq'] };
 var ID_SHORT = 'Jack_Lee', ID_LONG = 'jack-lee-international-trading-2026';
-function welBack(id, desc, cards){ return { h:'Welcome back, <span class="wid">' + esc(id) + '</span>', p:desc, cards:cards }; }
+function welBack(id, desc, cards, hist){ return { h:'Welcome back, <span class="wid">' + esc(id) + '</span>', p:desc, cards:cards, hist:hist }; }
 var ATTRS = [
   { name:'Color Temperature', vals:['3000K', '4000K', '6000K'] },
   { name:'Power', vals:['100W', '200W', '400W'] },
@@ -465,6 +460,7 @@ function resetConv(){ dlg.innerHTML = ''; dlg.classList.remove('top'); shown = [
 function welcome(cfg){
   cfg = cfg || WEL_FIRST; S.wel = cfg;
   dlg.innerHTML = ''; dlg.classList.add('top');
+  if (cfg.hist) { seedHist(cfg.hist === 'prod'); dlg.classList.remove('top'); }   // 超过24小时再回来：之前的聊天记录不清空，往上滑能看到
   var w = mk('div', 'wel');
   w.innerHTML = '<div class="head"><div class="pic"><video muted playsinline preload="auto" src="assets/wave.mp4"></video></div><div class="tt"><h2>' + cfg.h + '</h2><p>' + cfg.p + '</p></div></div><div class="ask">' +
     cfg.cards.map(function(k){ var c = WEL[k]; return '<button type="button" class="card" data-a="' + c.a + '"><span class="ci">' + ICONS[c.ic] + '</span><div><b>' + c.t + '</b><span class="d">' + c.d + '</span></div></button>'; }).join('') + '</div>';
@@ -472,7 +468,14 @@ function welcome(cfg){
   var v = $('video', w); v.play().catch(function(){});
   $('.pic', w).addEventListener('click', function(){ v.currentTime = 0; v.play().catch(function(){}); });
   [].slice.call(w.querySelectorAll('.card')).forEach(function(b){ b.addEventListener('click', function(){ cardAct(b.dataset.a, $('b', b).textContent); }); });
-  cv.scrollTop = 0;
+  cv.scrollTop = cfg.hist ? cv.scrollHeight : 0;
+}
+/* 之前的聊天记录（演示用一段示例）：withProducts＝Mica 展示过产品 */
+function seedHist(withProducts){
+  var turn = mk('div', 'turn'); turn.appendChild(mk('div', 'buyer', '<div class="bb"><div>I need waterproof LED flood lights for a parking lot, about 50 pieces.</div></div><div class="me">J</div>')); dlg.appendChild(turn);
+  var m = micaRow(turn, 'idle'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  t.textContent = withProducts ? 'For a parking lot, waterproofing is the first thing to check. Here are 6 that fit:' : 'Could you tell me a little more about how you’ll use it?';
+  if (withProducts) { var list = mk('div', 'pl'); inn.appendChild(list); ASSIST.slice(0, 6).forEach(function(p, i){ list.appendChild(cardEl(p, i, 0)); }); clampAll(list); }
 }
 function toEnd(){ requestAnimationFrame(function(){ cv.scrollTo({ top:cv.scrollHeight, behavior:FAST ? 'auto' : 'smooth' }); }); }
 function toEndSoft(){ if (cv.scrollHeight - cv.scrollTop - cv.clientHeight < 80) cv.scrollTop = cv.scrollHeight; }
@@ -568,11 +571,8 @@ async function route(text, att){
 async function cardAct(a, text){
   if (busy) return; buyerSays(text);
   if (a === 'find' || a === 'new') return answer({ intro:'Sure. Tell me what you’re sourcing — the product, quantity, or where you’ll use it — and I’ll find suppliers that fit.', steps:['Thinking…'], noFb:true });
-  if (a === 'best') return startA2(true);
+  if (a === 'pop') return startPop();
   if (a === 'rfq') return rfq();
-  if (a === 'good') return answer({ intro:'Glad to hear that! What are you sourcing next?', steps:['Thinking…'], noFb:true });
-  if (a === 'notq') return answer({ intro:'Sorry about that. Here are some others — tell me what was missing and I’ll narrow it down.', cards:ASSIST, steps:['Thinking…', 'Finding related products', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
-  if (a === 'cont') return answer({ intro:'Picking up where we left off — these LED flood lights match what you chose last time:', cards:ASSIST, steps:['Thinking…', 'Recalling your last request', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
 }
 /* 主动触发：A1 属性选项（内容1）、内容2、A2 榜单 */
 async function startA1(){
@@ -599,6 +599,13 @@ function attrsBox(inn, m){
 async function startA1b(){
   var turn = mk('div', 'turn'); dlg.appendChild(turn); var m = micaRow(turn, 'speak', 'g6'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
   await stream(t, 'Tell me everything you need for ' + esc(QUERY) + ' — use, size, quantity, budget — and I’ll find the closest match.'); m.set('idle'); toEnd();
+}
+/* 开场卡「Show me the Popular Listing」：买家所在地区的热门产品，卡片样式同榜单 */
+async function startPop(){
+  var turn = lastTurn(); var m = micaRow(turn, 'speak'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  await stream(t, 'Here’s what’s popular in your region right now:');
+  var list = mk('div', 'pl'); inn.appendChild(list); ASSIST.slice(0, 3).forEach(function(p, i){ list.appendChild(cardEl(p, i, i + 1)); }); clampAll(list); shown = ASSIST.slice(0, 3);
+  m.set('idle'); toEnd();
 }
 async function startA2(asReply){
   var turn = asReply ? lastTurn() : mk('div', 'turn'); if (!asReply) dlg.appendChild(turn);
@@ -674,10 +681,10 @@ function typed(text, att){ ta.value = text; if (att) S.att = att; renderAtt(); l
 var SCENES = [
   { g:'开场与再次打开', items:[
     scn('开场 · 点入口打开', function(){ resetConv(); welcome(WEL_FIRST); }),
-    scn('再次打开 · 问候', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Good to see you again.<br>What are you sourcing today?', ['find', 'best'])); }),
-    scn('再次打开 · 买家ID过长', function(){ resetConv(); welcome(welBack(ID_LONG, 'Good to see you again.<br>What are you sourcing today?', ['find', 'best'])); }),
-    scn('再次打开 · 问上次的结果', function(){ resetConv(); welcome(welBack(ID_SHORT, 'What are you sourcing today?<br>Were you happy with the products I found for you last time?', ['good', 'notq', 'newp'])); }),
-    scn('再次打开 · 接着上次的采购', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Last time we were looking for LED flood lights.<br>Would you like to pick up where we left off?', ['cont', 'fresh'])); }) ] },
+    scn('再次打开 · 24小时内', function(){ resetConv(); S.wel = null; seedHist(true); dlg.classList.remove('top'); cv.scrollTop = cv.scrollHeight; }),
+    scn('再次打开 · 上次没展示过产品', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Good to see you again.<br>What are you sourcing today?', ['find', 'pop', 'rfq'], 'noprod')); }),
+    scn('再次打开 · 上次展示过产品', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Good to see you again.<br>What are you sourcing today?', ['find', 'pop'], 'prod')); }),
+    scn('再次打开 · 买家ID过长', function(){ resetConv(); welcome(welBack(ID_LONG, 'Good to see you again.<br>What are you sourcing today?', ['find', 'pop', 'rfq'], 'noprod')); }) ] },
   { g:'主动触发（点提示胶囊后）', items:[
     scn('A1 · 属性选项', function(){ resetConv(); startA1(); }),
     scn('A1 · 内容2', function(){ resetConv(); startA1b(); }),
