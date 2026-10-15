@@ -14,8 +14,9 @@
 <title>Mica · AI Sourcing Guide</title>
 <style>
 @font-face{font-family:Roboto;src:url(assets/roboto-latin.woff2) format('woff2');font-weight:100 900;font-display:swap}
-/* 数值全部取自 Figma 移动端稿（文件 wH48tPrHVMZzCtew6w1NGZ·画板 358:4716）：
-   助手页骨架 358:4903／开场 358:4732／生成中 358:4868／缩小规格 641:6608／只有1款 657:6812／提示胶囊 366:5274／输入框聚焦 390:5800 */
+/* 数值取自 Figma 移动端稿（文件 wH48tPrHVMZzCtew6w1NGZ·画板 358:4716）：
+   骨架 358:4903／开场 358:4732／生成中 358:4868／缩小规格 641:6608／只有1款 657:6812／提示胶囊 366:5274／输入框聚焦 390:5800／
+   没结果 358:5047／RFQ 表单 453:6448／出错 358:5078／重试仍失败 359:5797／额度 360:5461／再次打开 609:7530 等／榜单 358:4811／输入框各状态 406:6859 等 */
 :root{--ink:#222;--ink2:#555;--ink3:#888;--hint:#b3b3b3;--line:#ced3d9;--card-line:#dae0e6;--bg:#f5f7fa;--red:#e64545;--blue:#007dfa;--sh:0 2px 12px rgba(60,75,140,.08)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
@@ -47,7 +48,6 @@ svg{display:block}
 /* ── 入口圆圈＋提示胶囊。滑动时整体完全收起（连描边和投影），停下 0.5 秒后回来（Figma 661:6745） ── */
 #entry{position:fixed;right:8px;bottom:134px;z-index:30;width:48px;height:48px;transition:transform .2s ease-out}
 #entry.away{transform:translateX(120px)}
-#entry.hide{display:none}
 #ring{position:absolute;right:0;bottom:0;width:48px;height:48px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#007dfa,#5b6cff,#8b5cf6);box-shadow:0 5px 12px 4px rgba(0,0,0,.08),0 3px 6px rgba(0,0,0,.12),0 1px 2px -2px rgba(0,0,0,.1);transition:opacity .2s}
 #ring .av2{width:100%;height:100%}
 /* 提示胶囊 366:5274：277×50＋外描边 2；头像 42；padding 4/16/4/4；间距 8 */
@@ -55,7 +55,7 @@ svg{display:block}
 #cap.on{width:281px;opacity:1;pointer-events:auto}
 #cap .av{flex:none;width:42px;height:42px;border-radius:50%;overflow:hidden;background:#6aa8ff;box-shadow:0 5px 12px 4px rgba(0,0,0,.08),0 3px 6px rgba(0,0,0,.12),0 1px 2px -2px rgba(0,0,0,.1)}
 #cap .av .av2{width:100%;height:100%}
-#cap .tx{width:207px;flex:none;white-space:nowrap}
+#cap .tx{width:207px;flex:none;white-space:nowrap;text-align:left}
 #cap b{display:block;font-size:14px;line-height:22px;font-weight:700;color:var(--ink)}
 #cap b i{font-style:normal;background:linear-gradient(90deg,#007dfa,#8b5cf6);-webkit-background-clip:text;background-clip:text;color:transparent}
 #cap span{display:block;font-size:12px;line-height:18px;color:var(--ink)}
@@ -65,21 +65,21 @@ svg{display:block}
 #panel.show{display:flex}
 #panel.open{transform:none}
 body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
-/* page-header/m：44 高，左右 12，底部 1px #e6e6e6 */
-.ph{flex:none;background:#fff;box-shadow:inset 0 -1px 0 #e6e6e6;padding-top:env(safe-area-inset-top)}  /* 底部 1px 描边画在 44 高以内（Figma 内描边） */
+/* page-header/m：44 高，左右 12，底部 1px #e6e6e6 画在 44 以内 */
+.ph{flex:none;background:#fff;box-shadow:inset 0 -1px 0 #e6e6e6;padding-top:env(safe-area-inset-top)}
 .ph .row{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;gap:8px}
 .ph .l,.ph .r{width:22px;height:44px;display:flex;align-items:center}
-.ph .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:32px;text-align:center}
+.ph .c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:32px;text-align:center;-webkit-user-select:none;user-select:none}
 .ph .c b{font-size:16px;line-height:20px;font-weight:700;color:var(--ink)}
-.ph .c span{font-size:12px;line-height:12px;color:var(--ink3);margin-top:0}
+.ph .c span{font-size:12px;line-height:12px;color:var(--ink3)}
 /* 对话区：padding 16，轮与轮间距 16，内容少时底部对齐 */
 #cv{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:16px;display:flex;flex-direction:column}
-.dlg{display:flex;flex-direction:column;gap:16px;margin-top:auto}
-.dlg.top{margin-top:0}
+.dlg{display:flex;flex-direction:column;gap:16px}   /* 内容少时从顶部排，内容超过一屏时滚到最新一条（Figma：没结果／榜单／内容2 都是顶部对齐） */
 .turn{display:flex;flex-direction:column;gap:12px;animation:up .25s}
 @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .buyer{display:flex;justify-content:flex-end;align-items:flex-start;gap:8px}
-.buyer .bb{background:#d9ebff;border-radius:16px 4px 16px 16px;padding:8px 14px;font-size:16px;line-height:24px;max-width:264px;word-break:break-word;color:var(--ink)}
+.buyer .bb{background:#d9ebff;border-radius:16px 4px 16px 16px;padding:8px 14px;font-size:16px;line-height:24px;max-width:264px;word-break:break-word;color:var(--ink);display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.buyer .bb .th{width:60px;height:60px;border-radius:8px;background:#fff center/cover no-repeat}
 .buyer .me{flex:none;width:28px;height:28px;border-radius:50%;background:#71cadc;color:#fff;font-size:14px;font-weight:700;line-height:16px;display:flex;align-items:center;justify-content:center}
 .mica{display:flex;flex-direction:column;gap:8px}
 .mica.thinking{gap:6px}
@@ -94,16 +94,28 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
 .ans-in{display:flex;flex-direction:column;gap:8px;border-radius:8px}
 .ans-in .t{font-size:16px;line-height:24px;color:var(--ink)}
 .pl{display:flex;flex-direction:column;gap:8px}
-.pd{display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border:1px solid var(--card-line);border-radius:8px;position:relative;animation:up .3s both}
+.pd{display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border:1px solid var(--card-line);border-radius:8px;animation:up .3s both}
 .pd .im{flex:none;width:80px;height:80px;border-radius:4px;background:var(--bg) center/cover no-repeat}
-.pd .inf{flex:1;min-width:0;display:flex;flex-direction:column;gap:0}  /* 产品名＋价格间距 0，再空 2 才到起订量（Figma 产品信息 g2·内层 g0） */
+.pd .inf{flex:1;min-width:0;display:flex;flex-direction:column;gap:0}
 .pd .pn{font-size:12px;line-height:18px;color:var(--ink);max-height:36px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .pd .pr{font-size:16px;line-height:24px;font-weight:700;color:var(--ink);margin-bottom:2px}
 .pd .mq{font-size:12px;line-height:18px;color:var(--ink3)}
-.pd .rk{position:absolute;left:0;top:0;background:var(--red);color:#fff;font-size:12px;font-weight:700;padding:0 8px;height:20px;line-height:20px;border-radius:8px 0 8px 0}
+/* 榜单卡片 358:4811：高 108，信息列间距 4，名次角标 63×22 */
+.pd.rk .inf{gap:4px}
+.pd.rk .pr{margin-bottom:0}
+.pd.rk .mq{display:none}   /* 榜单卡片没有起订量（Figma 358:4811：角标＋名称＋价格） */
+.pd.rk .nm{display:flex;flex-direction:column;gap:0}
+.badge{display:flex;align-items:center;gap:2px;height:22px;padding:2px 8px 2px 6px;border-radius:1000px;color:#fff;font-size:12px;line-height:18px;font-weight:700;align-self:flex-start}
+.badge svg path{fill:#fff}
+.badge.g1{background:#faaa00}.badge.g2{background:#a3b8cc}.badge.g3{background:#bf8200}
 /* 追问建议：button secondary dark medium（高 32，padding 5/16，描边 #ced3d9，底 #f5f7fa） */
 .sugs{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
-.sug,.btn2{height:32px;padding:5px 16px;border:1px solid var(--line);background:var(--bg);border-radius:1000px;font-size:14px;line-height:22px;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:4px;animation:up .3s both;text-align:left}
+.sug{height:32px;padding:5px 16px;border:1px solid var(--line);background:var(--bg);border-radius:1000px;font-size:14px;line-height:22px;color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:4px;animation:up .3s both;text-align:left}
+/* 主按钮：button primary dark medium（高 32，padding 5/16，黑底白字） */
+.pbtn{height:32px;padding:5px 16px;border-radius:1000px;border:1px solid var(--ink);background:var(--ink);color:#fff;font-size:14px;line-height:22px;align-self:flex-start;display:inline-flex;align-items:center;justify-content:center}
+.pbtn:disabled{opacity:.4}
+.pbtn.lg{height:44px;padding:10px 16px;font-size:16px;line-height:24px;align-self:stretch;width:100%}
+.lnk{display:inline-flex;align-items:center;gap:2px;font-size:14px;line-height:22px;color:var(--ink);align-self:flex-start}
 /* 反馈：40×40 描边方块，图标 24，间距 8，左内缩 2 */
 .fb{display:flex;align-items:center;gap:8px;padding-left:2px;animation:up .3s both}
 .fb button{width:40px;height:40px;border:1px solid var(--card-line);border-radius:8px;display:flex;align-items:center;justify-content:center}
@@ -123,56 +135,94 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
 .wel .pic video{width:100%;height:100%;object-fit:cover;display:block;-webkit-mask-image:url(assets/wave-mask.png);mask-image:url(assets/wave-mask.png);-webkit-mask-size:100% 100%;mask-size:100% 100%;pointer-events:none}
 .wel .tt{display:flex;flex-direction:column;gap:6px}
 .wel h2{margin:0;font-size:24px;line-height:30px;font-weight:700;color:var(--ink)}
+.wel h2 .wid{display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 .wel p{margin:0;font-size:14px;line-height:22px;color:var(--ink2)}
 .ask{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
 .ask .card{display:flex;align-items:center;gap:10px;padding:10px 20px 10px 10px;background:#fff;border-radius:1000px;box-shadow:var(--sh);text-align:left}
 .ask .ci{flex:none;width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center}
 .ask b{display:block;font-size:14px;line-height:22px;font-weight:700;color:var(--ink)}
 .ask .d{display:block;font-size:12px;line-height:18px;color:var(--ink3)}
-/* 缩小规格 641:6608：属性行间距 10，属性名 14 Bold，选项高 30 */
+/* 缩小规格 641:6608：属性行间距 10，属性名 14 Bold，选项高 30；选中＝底 #f4f4f4＋2px #222 描边；提交后其余置灰 */
 .attrs{display:flex;flex-direction:column;gap:10px}
 .attrs .row{display:flex;flex-direction:column;gap:4px}
 .attrs .gn{font-size:14px;line-height:22px;font-weight:700;color:var(--ink)}
 .attrs .vals{display:flex;flex-wrap:wrap;gap:8px}
 .chip{height:30px;padding:4px 12px;border:1px solid #b3b3b3;border-radius:1000px;background:#fff;font-size:14px;line-height:22px;color:var(--ink)}
-.chip.sel{border-color:var(--ink)}
-.lock{opacity:.55;pointer-events:none}
-.pbtn{height:32px;padding:5px 16px;border-radius:1000px;border:1px solid var(--ink);background:var(--ink);color:#fff;font-size:14px;line-height:22px;align-self:flex-start}
-.pbtn:disabled{opacity:.4}
-/* 对比表（移动端 Figma 没有这个画面：沿用同一套卡片语言，待设计） */
-.cmp{border:1px solid var(--card-line);border-radius:8px;overflow:hidden;font-size:12px;line-height:18px;background:#fff}
-.cmp .r{display:grid;grid-template-columns:56px repeat(var(--n),96px);border-top:1px solid var(--card-line)}
-.cmp .r:first-child{border-top:0}
-.cmp .h{background:var(--bg);padding:8px 6px;color:var(--ink3)}
-.cmp .c{padding:8px 6px;word-break:break-word}
-.cmp .c img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:4px;display:block;margin-bottom:4px}
-.cmp .pp{font-weight:700;font-size:14px;line-height:20px}
-.cmp .pn{height:36px;overflow:hidden}
-.form{display:flex;flex-direction:column;gap:10px}
-.form label{display:block;font-size:12px;line-height:18px;color:var(--ink3);margin-bottom:2px}
-.form input,.form textarea{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:inherit;font-size:16px;line-height:24px;background:#fff}
-/* 输入区：padding 8/12，行间距 6；输入框 padding 6、描边 1 #ced3d9、圆角 24；按钮 32×32 */
+.chip.sel{background:#f4f4f4;border:2px solid var(--ink);padding:3px 11px}
+.attrs.lock .chip:not(.sel){opacity:.4}
+.attrs.lock{pointer-events:none}
+/* RFQ 表单卡 453:6448：宽 343，padding 16，间距 12，描边 #dae0e6，圆角 8 */
+.rfq{background:#fff;border:1px solid var(--card-line);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.rfq h3{margin:0;font-size:20px;line-height:28px;font-weight:700;color:var(--ink)}
+.rfq .hint{margin:6px 0 0;font-size:14px;line-height:22px;color:var(--ink3)}
+.rfq .f{display:flex;flex-direction:column;gap:6px}
+.rfq label{display:block;font-size:16px;line-height:24px;font-weight:700;color:var(--ink);position:relative}
+.rfq label i{position:absolute;left:-8px;top:0;font-style:normal;font-weight:400;color:#ff5252}
+.rfq .in{width:100%;height:48px;border:1px solid #e6e6e6;border-radius:6px;padding:12px;font:inherit;font-size:16px;line-height:24px;background:#fff;color:var(--ink)}
+.rfq .in.err{border-color:var(--red)}
+.rfq .dt{border:1px solid var(--card-line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:10px;background:#fff}
+.rfq .ai{align-self:flex-start;display:flex;align-items:center;gap:6px;height:34px;padding:4px 12px 4px 10px;border:1px solid #d8dafa;background:#f0f0ff;border-radius:1000px;font-size:16px;line-height:24px;color:var(--ink)}
+.rfq .dt textarea{width:100%;border:0;outline:0;resize:none;font:inherit;font-size:16px;line-height:24px;padding:0;color:var(--ink);height:168px;background:none}
+.rfq .bt{display:flex;align-items:center;justify-content:space-between;height:32px}
+.rfq .qty{display:flex;gap:8px}
+.rfq .qty .in{flex:1;min-width:0}
+.rfq .qty .sel{position:relative;width:130px;flex:none}
+.rfq .qty select{width:100%;height:48px;border:1px solid #e6e6e6;border-radius:6px;padding:0 36px 0 12px;font:inherit;font-size:16px;background:#fff;color:var(--ink);-webkit-appearance:none;appearance:none}
+.rfq .qty .sel svg{position:absolute;right:12px;top:15px;pointer-events:none}
+.rfq .cnt2{font-size:12px;line-height:18px;color:var(--ink3)}
+/* 输入区：padding 8/12，行间距 6；单行＝胶囊（圆角 24）；多行／有附件＝圆角矩形（圆角 16，文字在上，+ 在左下，发送在右下） */
 .foot{flex:none;background:var(--bg)}
 .foot .in{padding:8px 12px;display:flex;flex-direction:column;align-items:center;gap:6px}
 .foot .safe{height:env(safe-area-inset-bottom)}
 .inp{width:100%;display:flex;align-items:flex-end;gap:8px;padding:6px;background:#fff;border:1px solid var(--line);border-radius:24px}
 .inp:focus-within{border-color:var(--ink)}
-.ib{flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center}
-.inp .box{flex:1;min-width:0;padding:4px 0}
-.inp textarea{display:block;width:100%;border:0;outline:0;resize:none;font:inherit;font-size:16px;line-height:24px;padding:0;max-height:96px;background:none;color:var(--ink);overflow-y:auto}
-.inp textarea::placeholder{color:var(--hint)}
-.sb{flex:none;width:32px;height:32px;border-radius:50%;background:var(--ink);border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;opacity:.4}
+.inp.over{border-color:var(--red)}
+.ops,.rt{display:contents}
+.ib{order:0;flex:none;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--bg);display:flex;align-items:center;justify-content:center}
+.ib:disabled{opacity:.4}
+.inp .box{order:1;flex:1;min-width:0;padding:4px 0}
+.sb{order:2;flex:none;width:32px;height:32px;border-radius:50%;background:var(--ink);border:1px solid var(--ink);display:flex;align-items:center;justify-content:center;opacity:.4}
 .sb.on{opacity:1}
-.disc{font-size:12px;line-height:18px;color:var(--ink3);text-align:center;width:280px}
-#toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;line-height:22px;z-index:300;opacity:0;pointer-events:none;transition:opacity .2s;max-width:80%;text-align:center}
+.cnt{display:none;order:2;font-size:12px;line-height:18px;color:var(--red)}
+.inp textarea{display:block;width:100%;border:0;outline:0;resize:none;font:inherit;font-size:16px;line-height:24px;padding:0;max-height:96px;background:none;color:var(--ink);overflow-y:auto}
+.inp textarea::placeholder{color:var(--hint);opacity:1}
+.att{display:none;order:0}
+.inp.multi{flex-direction:column;align-items:stretch;gap:4px;padding:12px 8px 8px 8px;border-radius:16px}
+.inp.multi .box{order:1;padding:4px 0 4px 8px}
+.inp.multi .ops{display:flex;align-items:center;justify-content:space-between;order:2}
+.inp.multi .rt{display:flex;align-items:center;gap:8px}
+.inp.over .cnt{display:block}
+.inp.has-att .att{display:flex;padding:0 0 4px 8px}
+.th2{position:relative;width:60px;height:60px;border-radius:8px;background:#eee center/cover no-repeat;overflow:hidden;flex:none}
+.xb{position:absolute;right:4px;top:4px;width:20px;height:20px;border-radius:50%;background:#888;display:flex;align-items:center;justify-content:center}
+.fc{position:relative;display:flex;align-items:center;gap:8px;padding:6px 36px 6px 6px;background:#fff;border:1px solid var(--card-line);border-radius:8px;max-width:100%}
+.fc .nm{min-width:0}
+.fc b{display:block;font-size:14px;line-height:22px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+.fc span{display:block;font-size:12px;line-height:18px;color:var(--ink3)}
+.fc .xb{right:3px;top:3px}   /* 文件卡右上角 ×：距卡片边 4（含 1 的描边） */
+/* 额度用完：Log In 大按钮在输入框上方，输入框变灰说明 */
+.inp.quota{min-height:114px}
+.inp.quota textarea{height:48px;cursor:default}
+#login{display:none}
+#login.on{display:flex}
+/* 提示：toast（黑 75%，圆角 8，padding 10/12），在页头下面 */
+#toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 96px);transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 12px;border-radius:8px;font-size:14px;line-height:22px;z-index:300;opacity:0;pointer-events:none;transition:opacity .2s;max-width:80%;text-align:center}
 #toast.on{opacity:1}
 #home-hint{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));background:#222;color:#fff;border-radius:12px;padding:12px 14px;font-size:13px;line-height:20px;z-index:400;display:none}
 #home-hint u{text-decoration:none;color:#9cc8ff}
+/* 演示场景表（长按助手页标题或入口圆圈打开） */
+#picker{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);display:none;align-items:flex-end}
+#picker.on{display:flex}
+#picker .sheet{width:100%;max-height:78%;overflow-y:auto;background:#fff;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+#picker h4{margin:0 0 8px;font-size:16px;line-height:24px}
+#picker .g{font-size:12px;line-height:18px;color:var(--ink3);margin:12px 0 6px}
+#picker .it{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--card-line);border-radius:8px;margin-bottom:6px;font-size:14px;line-height:20px}
 #gate{position:fixed;inset:0;z-index:1000;background:#fff;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center}
 #gate b{font-size:20px}#gate span{font-size:14px;color:#888}
 #gate input{width:220px;height:48px;border:1px solid #ced3d9;border-radius:24px;text-align:center;font-size:20px;letter-spacing:6px;outline:0}
 #gate button{width:220px;height:48px;border-radius:24px;background:#e64545;color:#fff;font-size:16px}
 #gate i{font-style:normal;color:#e64545;font-size:13px;min-height:18px}
+
 
 </style>
 </head>
@@ -193,6 +243,7 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
   document.getElementById('gc').addEventListener('keydown', function(e){ if (e.key==='Enter') go(); });
 })();
 </script>
+
 
 <div id="page">
 <div class="sticky">
@@ -216,23 +267,27 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
 <div id="panel" role="dialog" aria-label="Mica">
   <div class="ph"><div class="row">
     <button class="l" id="close" aria-label="Close" data-ic="close"></button>
-    <div class="c"><b>Mica</b><span>Your AI Sourcing Guide</span></div>
+    <div class="c" id="ptitle"><b>Mica</b><span>Your AI Sourcing Guide</span></div>
     <div class="r"></div>
   </div></div>
   <div id="cv"><div class="dlg" id="dlg"></div></div>
   <div class="foot"><div class="in">
-    <div class="inp"><button class="ib" id="plus" aria-label="Add" data-ic="add"></button>
-      <div class="box"><textarea id="ta" rows="1" placeholder="Tell Mica what you are looking for…"></textarea></div>
-      <button class="sb" id="send" aria-label="Send" data-ic="arrowUp"></button></div>
-    <div class="disc">Answers are AI-generated and may contain mistakes</div>
+    <button class="pbtn lg" id="login">Log In</button>
+    <div class="inp" id="inp">
+      <div class="att" id="att"></div>
+      <div class="box"><textarea id="ta" rows="1" maxlength="1000" placeholder="Tell Mica what you are looking for…"></textarea></div>
+      <div class="ops"><button class="ib" id="plus" aria-label="Add" data-ic="add"></button><div class="rt"><span class="cnt" id="cnt">1000/1000</span><button class="sb" id="send" aria-label="Send" data-ic="arrowUp"></button></div></div>
+    </div>
+    <div class="disc" id="disc" style="font-size:12px;line-height:18px;color:#888;text-align:center;width:280px">Answers are AI-generated and may contain mistakes</div>
   </div><div class="safe"></div></div>
+  <input type="file" id="file" style="display:none" accept=".txt,.md,.csv,.json,.html,.xlsx,.docx,.pdf,.png,.jpg,.jpeg,.gif,.webp,.pptx,image/*">
 </div>
 <div id="toast"></div>
+<div id="picker"><div class="sheet"><h4>Demo scenes</h4><div id="pk"></div></div></div>
 <div id="home-hint">Tap <u>Share</u> → <u>Add to Home Screen</u> to open this demo full-screen, even offline. <u id="hh-x" style="float:right">OK</u></div>
 
 <script>
 var PRODUCTS = [{"id": 1, "title": "16inch 48V 1000W Fat Tire Electric Bike Lithium Battery E Bicycle Motorcycle Fat Tyre City Leisure U2", "price": "US$245.00-289.00", "moq": "10 Pieces", "co": "Linyi Huanyu Jindong New Energy Technology Co., Ltd.", "img": "assets/p1.jpg"}, {"id": 2, "title": "2000W Powerful Motor U2 Lithium or Acid Battery Electric Bike /Motorcycle/E-Bike/Electric Bicycle/Moped for Long Distance Daily Commute Trips", "price": "US$189.00-359.00", "moq": "50 Pieces", "co": "Linyi Lansheng New Energy Electric Vehicle Co., Ltd", "img": "assets/p2.jpg"}, {"id": 3, "title": "New 2026 Hot Sale High Quality Cheap Electric Bicycle for Adults", "price": "US$214.00-239.00", "moq": "2 Pieces", "co": "Linyi Waytop New Energy Co., Ltd.", "img": "assets/p3.jpg"}, {"id": 4, "title": "EB S1E Electric Motorbike EEC L1 NCM Lithium 500W/750W LUYUAN electric vehicle electric bicycle", "price": "US$798.00", "moq": "100 Pieces", "co": "Zhejiang Luyuan Electric Vehicle Co., Ltd.", "img": "assets/p4.jpg"}, {"id": 5, "title": "All Terrain Cheap Electric Scooter Moto Adventure E-Bike for Sale", "price": "US$205.00-318.00", "moq": "50 Sets", "co": "BLITZBEAR E MOTO CO., LTD.", "img": "assets/p5.jpg"}, {"id": 6, "title": "Bicicleta Elctrica 72V Battery 1000W Two Wheels Electric Bicycle", "price": "US$215.00-335.00", "moq": "10 Pieces", "co": "Shandong Jingpin Electric Vehicle Technology Co., Ltd.", "img": "assets/p6.jpg"}, {"id": 7, "title": "Strong and Robust Yuedong Customizable 60V 20ah E-Bicycle for Green Travel", "price": "US$200.00-250.00", "moq": "30 Unit", "co": "Taizhou Yiku New Energy Technology Co., Ltd.", "img": "assets/p7.jpg"}, {"id": 8, "title": "Myatu Manufacture 750W Front Motor Fat Tire 3 Wheel E Bike Tricycle", "price": "US$600.00-900.00", "moq": "10 piece", "co": "Guangzhou Yiso Ebike Co., Ltd.", "img": "assets/p8.jpg"}, {"id": 9, "title": "Custom Manufacturer Private Brand Custom Color Electric Lightweight Motor Bike for Retail Chain Electric Motorbike Buyer", "price": "US$750.00-850.00", "moq": "10 Pieces", "co": "Wuxi Winboard Intelligent Technology Co., Ltd.", "img": "assets/p9.jpg"}];
-/* 图标：从 Figma 移动端稿里的实例直接导出（节点 358:4733／358:4744／358:4750／358:4756／387:10393／358:4764／358:4961／358:4962／358:4963） */
 var ICONS = {
   close:'<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11.0025 11.973L17.3129 18.2833L18.2852 17.311L11.9748 11.0007L18.2918 4.6837L17.3195 3.71143L11.0025 10.0284L4.691 3.71688L3.71875 4.68915L10.0303 11.0007L3.71992 17.311L4.69222 18.2833L11.0025 11.973Z" fill="#222222"/></svg>',
   search:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.21875 2.5C12.9294 2.5 15.9375 5.50809 15.9375 9.21875C15.9375 10.849 15.3566 12.3436 14.3909 13.5071L17.4854 16.6016L16.6016 17.4854L13.5071 14.3909C12.3436 15.3566 10.849 15.9375 9.21875 15.9375C5.50809 15.9375 2.5 12.9294 2.5 9.21875C2.5 5.50809 5.50809 2.5 9.21875 2.5ZM9.21875 3.75C6.19844 3.75 3.75 6.19844 3.75 9.21875C3.75 12.2391 6.19844 14.6875 9.21875 14.6875C12.2391 14.6875 14.6875 12.2391 14.6875 9.21875C14.6875 6.19844 12.2391 3.75 9.21875 3.75Z" fill="#222222"/></svg>',
@@ -244,12 +299,23 @@ var ICONS = {
   thumbDown:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17.1738 3C18.6692 3.00011 19.9363 4.10172 20.1445 5.58252L20.9883 11.5825C21.2419 13.3876 19.8404 14.9999 18.0176 15H13.5V18C13.5 19.6569 12.1569 21 10.5 21H10.1719C9.48357 21 8.88276 20.531 8.71582 19.8633L7.5 15H4.5C3.67157 15 3 14.3284 3 13.5V4.5C3 3.67157 3.67157 3 4.5 3H17.1738ZM9 14.8154L10.1719 19.5H10.5C11.1213 19.5 11.5605 19.0605 11.5605 19.0605C11.9999 18.6212 12 18 12 18V13.5H18.0176C18.7011 13.4999 19.1499 12.9844 19.1499 12.9844C19.5984 12.4684 19.5029 11.7905 19.5029 11.7905L18.6592 5.79053C18.5819 5.24261 18.1688 4.87694 18.1582 4.86768C17.7398 4.50397 17.1864 4.50005 17.1738 4.5H9V14.8154ZM4.5 13.5H7.5V4.5H4.5V13.5Z" fill="#888888"/></svg>',
   refresh:'<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M21.4409 7.39893C22.1192 8.78823 22.5 10.3499 22.5 12C22.5 17.799 17.799 22.5 12 22.5C9.76455 22.5 7.69247 21.8011 5.98975 20.6104L5.98535 21.7397L4.48535 21.7354L4.5 17.7979L8.4375 17.8125L8.43164 19.3125L6.74268 19.3052C8.22163 20.3712 10.0376 21 12 21C16.9706 21 21 16.9706 21 12C21 10.6233 20.6913 9.31856 20.1387 8.15186L21.4409 7.39893ZM12 1.5C14.2334 1.5 16.304 2.19794 18.0059 3.38672L18 2.23828L19.5 2.22949L19.5205 6.16699L15.583 6.1875L15.5742 4.6875L17.2368 4.67871C15.7617 3.62177 13.9531 3 12 3C7.02944 3 3 7.02944 3 12C3 13.3669 3.30436 14.6629 3.84961 15.8232L2.54736 16.5762C1.87664 15.1931 1.5 13.6403 1.5 12C1.5 6.20101 6.20101 1.5 12 1.5Z" fill="#888888"/></svg>'
 };
+/* 以下是第三轮补的：从 Figma 实例导出（附件 PDF 48／下拉箭头 18／AI 星光 16／右箭头 16）；closeSm＝页头 close 缩到 12 白色；medalS＝奖牌缩到 16 */
+ICONS.closeSm = ICONS.close.replace('width="22" height="22"', 'width="12" height="12"').replace('fill="#222222"', 'fill="#ffffff"');
+ICONS.medalS = ICONS.medal.replace('width="20" height="20"', 'width="16" height="16"');
+ICONS.down = '<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15.8002 5.24529L8.99911 12.0079L2.19819 5.24527L1.48438 5.96313L8.99909 13.4355L16.514 5.96316L15.8002 5.24529Z" fill="#222222"/></svg>';
+ICONS.star = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 0C8 4.4 11.6 8 16 8C11.6 8 8 11.6 8 16C8 11.6 4.4 8 0 8C4.4 8 8 4.4 8 0Z" fill="url(#mcstar)"/><defs><linearGradient id="mcstar" x1="0" y1="8" x2="16" y2="8" gradientUnits="userSpaceOnUse"><stop stop-color="#007DFA"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient></defs></svg>';
+ICONS.rightBig = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.74221 1.94391L10.733 7.96876L4.74219 13.9934L5.37816 14.6258L11.9978 7.96877L5.37819 1.31152L4.74221 1.94391Z" fill="#222222"/></svg>';
+ICONS.pdf = '<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><path d="M10 0H28.3431C29.404 0 30.4214 0.421427 31.1716 1.17157L42.8284 12.8284C43.5786 13.5786 44 14.596 44 15.6569V42C44 45.3137 41.3137 48 38 48H10C6.68629 48 4 45.3137 4 42V6C4 2.68629 6.68629 0 10 0Z" fill="#E64545"/><path d="M13.5938 38.1035V42H12.2812V32.0469H15.9521C17.0413 32.0469 17.8947 32.3249 18.5122 32.8809C19.1297 33.4368 19.4385 34.1729 19.4385 35.0889C19.4385 36.055 19.1366 36.799 18.5327 37.3208C17.9289 37.8426 17.0641 38.1035 15.9385 38.1035H13.5938ZM13.5938 37.0303H15.9521C16.654 37.0303 17.1917 36.8651 17.5654 36.5347C17.9391 36.2043 18.126 35.7269 18.126 35.1025C18.126 34.5101 17.9391 34.0361 17.5654 33.6807C17.1917 33.3252 16.679 33.1406 16.0273 33.127H13.5938V37.0303ZM21.1133 42V32.0469H23.9229C24.7887 32.0469 25.5544 32.2383 26.2197 32.6211C26.8851 33.0039 27.3989 33.5485 27.7612 34.2549C28.1235 34.9613 28.307 35.7725 28.3115 36.6885V37.3242C28.3115 38.263 28.1304 39.0856 27.7681 39.792C27.4058 40.4984 26.8885 41.0407 26.2163 41.4189C25.5441 41.7972 24.7614 41.9909 23.8682 42H21.1133ZM22.4258 33.127V40.9268H23.8066C24.8184 40.9268 25.6056 40.6123 26.1685 39.9834C26.7313 39.3545 27.0127 38.459 27.0127 37.2969V36.7158C27.0127 35.5856 26.7472 34.7072 26.2163 34.0806C25.6854 33.4539 24.9323 33.1361 23.957 33.127H22.4258ZM35.7832 37.6045H31.6064V42H30.2939V32.0469H36.46V33.127H31.6064V36.5312H35.7832V37.6045Z" fill="white"/></svg>';
+
+</script>
+<script>
 (function(){
 'use strict';
 var $ = function(s, r){ return (r || document).querySelector(s); };
 var mk = function(tag, cls, html){ var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
 var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); };
-var wait = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
+var FAST = false;
+var wait = function(ms){ return new Promise(function(r){ setTimeout(r, FAST ? Math.min(ms, 30) : ms); }); };
 function toast(t){ var e = $('#toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(function(){ e.classList.remove('on'); }, 2400); }
 [].slice.call(document.querySelectorAll('[data-ic]')).forEach(function(b){ b.innerHTML = ICONS[b.dataset.ic]; });
 
@@ -259,6 +325,7 @@ PRODUCTS.forEach(function(p){
   grid.appendChild(mk('div', 'pc', '<div class="im" style="background-image:url(' + p.img + ')"></div><div class="tx"><div class="tt">' + esc(p.title) + '</div><div class="pr">' + esc(p.price) + '</div><div class="mq">' + esc(p.moq) + ' (MOQ)</div><div class="au">Audited</div></div>'));
 });
 $('#top').addEventListener('click', function(){ window.scrollTo({ top:0, behavior:'smooth' }); });
+var QUERY = 'electric bicycle';
 
 /* ══ 2. 入口：滑动时完全收起，停下 0.5 秒后回来 ══ */
 var entry = $('#entry'), cap = $('#cap'), ring = $('#ring'), idleT = null, capSeen = false, panelOpen = false;
@@ -273,7 +340,8 @@ window.addEventListener('scroll', function(){
 document.addEventListener('touchstart', function(){ if (entry.classList.contains('away')) clearTimeout(idleT); }, { passive:true });
 document.addEventListener('touchend', function(){ if (entry.classList.contains('away')) comeBack(); }, { passive:true });
 document.addEventListener('touchcancel', function(){ if (entry.classList.contains('away')) comeBack(); }, { passive:true });
-/* Mica 动画：入口圆圈平时待机（循环），圆圈第一次出现和提示胶囊展开时挥手一遍再回到待机 */
+
+/* Mica 动画：入口圆圈平时待机（循环），首次出现和提示胶囊展开时挥手一遍再回到待机 */
 var AVS = [];
 function makeAv(kinds){
   var box = mk('div', 'av2'), o = { box:box, v:{}, cur:null };
@@ -303,16 +371,18 @@ setTimeout(function(){                                   // 停留 6 秒没滑�
 }, 6000);
 
 /* ══ 3. 助手页：整页从右边滑入；关闭时滑回去，搜索结果页回到原来的位置 ══ */
-var panel = $('#panel'), cv = $('#cv'), dlg = $('#dlg'), ta = $('#ta'), sendB = $('#send'), page = $('#page'), y0 = 0;
-var busy = false, last = null, shown = [];
+var panel = $('#panel'), cv = $('#cv'), dlg = $('#dlg'), ta = $('#ta'), sendB = $('#send'), inp = $('#inp'), page = $('#page'), y0 = 0;
+var busy = false, last = null, shown = [], S = { quota:false, wel:null, lastText:'', att:null, failNext:false };
 function vvFit(){ var vv = window.visualViewport; if (!vv || !panelOpen) return; panel.style.height = vv.height + 'px'; panel.style.transform = vv.offsetTop ? 'translateY(' + vv.offsetTop + 'px)' : ''; }
 if (window.visualViewport) { visualViewport.addEventListener('resize', vvFit); visualViewport.addEventListener('scroll', vvFit); }
-function openPanel(){
+function openPanel(kind){
   if (panelOpen) return; panelOpen = true; clearTimeout(idleT); setCap(false); capSeen = true;
   y0 = window.scrollY; panel.style.height = '100%'; panel.classList.add('show');
   requestAnimationFrame(function(){ requestAnimationFrame(function(){ panel.classList.add('open'); }); });
   setTimeout(function(){ if (!panelOpen) return; document.body.classList.add('in-panel'); window.scrollTo(0, 0); vvFit(); }, 380);  // 滑入完成后，底下的页面收起，键盘弹出时就没东西可透
-  if (!dlg.children.length) welcome();
+  if (kind === 'a1') { resetConv(); setTimeout(function(){ startA1(); }, 420); }
+  else if (kind === 'a2') { resetConv(); setTimeout(function(){ startA2(); }, 420); }
+  else if (!dlg.children.length) welcome();
 }
 function closePanel(){
   if (!panelOpen) return; ta.blur(); panelOpen = false;
@@ -321,46 +391,96 @@ function closePanel(){
   requestAnimationFrame(function(){ panel.classList.remove('open'); });
   setTimeout(function(){ if (!panelOpen) panel.classList.remove('show'); }, 360);
 }
-ring.addEventListener('click', openPanel); cap.addEventListener('click', openPanel); $('#close').addEventListener('click', closePanel);
-document.addEventListener('touchmove', function(e){ if (panelOpen && !e.target.closest('#cv')) e.preventDefault(); }, { passive:false });
+var longPressed = false;
+function onLong(el, fn){ var t = null; el.addEventListener('touchstart', function(){ longPressed = false; t = setTimeout(function(){ longPressed = true; fn(); }, 700); }, { passive:true }); ['touchend', 'touchmove', 'touchcancel'].forEach(function(ev){ el.addEventListener(ev, function(){ clearTimeout(t); }, { passive:true }); }); }
+ring.addEventListener('click', function(){ if (longPressed) { longPressed = false; return; } openPanel(); });
+cap.addEventListener('click', function(){ openPanel('a1'); });
+$('#close').addEventListener('click', closePanel);
+document.addEventListener('touchmove', function(e){ if (panelOpen && !e.target.closest('#cv, #picker, .rfq textarea, #ta')) e.preventDefault(); }, { passive:false });
 
-/* ══ 4. 对话 ══ */
-var WEL = [
-  { ic:'search', t:'Help me find a product', d:'Describe it, I’ll match products', a:'find' },
-  { ic:'medal', t:'Show me the Best Selling list', d:'Top picks for what you searched', a:'best' },
-  { ic:'purchase', t:'Post a request for quotation', d:'Tell me what you need, I’ll write it up', a:'rfq' }
-];
-var ASK = 'Tell me what you’re sourcing — the product, quantity, or where you’ll use it — and I’ll match products for you.';
+/* ══ 4. 输入区：单行胶囊 → 多行／有附件时变圆角矩形；上传图片和文件；1000 字上限 ══ */
+var OKEXT = ['txt', 'md', 'csv', 'json', 'html', 'xlsx', 'docx', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp', 'pptx'];
+function fmtSize(b){ return b >= 1048576 ? (b / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(b / 1024)) + ' KB'; }
+function renderAtt(){
+  var host = $('#att'); host.innerHTML = '';
+  if (!S.att) { inp.classList.remove('has-att'); $('#plus').disabled = false; layout(); return; }
+  inp.classList.add('has-att'); $('#plus').disabled = true;
+  var a = S.att, x = '<span class="xb" data-x="1">' + ICONS.closeSm + '</span>';
+  if (a.kind === 'img') host.innerHTML = '<div class="th2" style="background-image:url(' + a.url + ')">' + x + '</div>';
+  else host.innerHTML = '<div class="fc">' + ICONS.pdf + '<div class="nm"><b>' + esc(a.name) + '</b><span>' + esc(a.size) + '</span></div>' + x + '</div>';
+  host.querySelector('[data-x]').addEventListener('click', function(){ S.att = null; renderAtt(); sync(); });
+  layout();
+}
+function layout(){
+  var multi = inp.classList.contains('multi'), need = !!S.att || S.quota;
+  if (!multi && !need) { ta.style.height = 'auto'; if (ta.scrollHeight > 28) need = true; }
+  if (need) inp.classList.add('multi');
+  else if (!ta.value && !S.att) inp.classList.remove('multi');
+  ta.style.height = 'auto'; ta.style.height = Math.min(96, Math.max(24, ta.scrollHeight)) + 'px';
+  inp.classList.toggle('over', ta.value.length >= 1000);
+  if (cv && panelOpen) toEndSoft();
+}
+function sync(){ var ok = (ta.value.trim().length > 0 || !!S.att) && !busy && !S.quota && ta.value.length < 1000; sendB.classList.toggle('on', ok); }
+ta.addEventListener('input', function(){ layout(); sync(); });
+function pickFile(f){
+  if (!f) return;
+  var ext = (f.name.split('.').pop() || '').toLowerCase();
+  if (OKEXT.indexOf(ext) < 0 && f.type.indexOf('image/') !== 0) { toast('Unsupported file type'); return; }
+  if (f.size > 5 * 1048576) { toast('File is too large (max 5MB)'); return; }
+  var isImg = f.type.indexOf('image/') === 0;
+  S.att = { kind:isImg ? 'img' : 'file', name:f.name, size:fmtSize(f.size), url:isImg ? URL.createObjectURL(f) : '' };
+  renderAtt(); sync();
+}
+$('#plus').addEventListener('click', function(){ if (S.quota || S.att) return; $('#file').click(); });
+$('#file').addEventListener('change', function(e){ pickFile(e.target.files[0]); e.target.value = ''; });
+function attBubble(a){ if (!a) return ''; return a.kind === 'img' ? '<div class="th" style="background-image:url(' + a.url + ')"></div>' : '<div class="fc" style="padding-right:12px">' + ICONS.pdf + '<div class="nm"><b>' + esc(a.name) + '</b><span>' + esc(a.size) + '</span></div></div>'; }
+
+/* ══ 5. 对话 ══ */
+var WEL = {
+  find:{ ic:'search', t:'Help me find a product', d:'Describe it, I’ll match products', a:'find' },
+  best:{ ic:'medal', t:'Show me the Best Selling list', d:'Top picks for what you searched', a:'best' },
+  rfq:{ ic:'purchase', t:'Post a request for quotation', d:'Tell me what you need, I’ll write it up', a:'rfq' },
+  good:{ ic:'search', t:'Yes, they were a good fit', d:'Tell me what you need next', a:'good' },
+  notq:{ ic:'search', t:'Not quite, show me others', d:'Tell me what was missing', a:'notq' },
+  newp:{ ic:'search', t:'I’m sourcing something new', d:'Describe it, I’ll match products', a:'new' },
+  cont:{ ic:'search', t:'Continue with electric bicycles', d:'Pick up where we left off', a:'cont' },
+  fresh:{ ic:'search', t:'Start something new', d:'Describe it, I’ll match products', a:'new' }
+};
+var WEL_FIRST = { h:"Hi, I'm Mica", p:"Your AI Sourcing Guide on Made-in-China.com. Tell me what you're sourcing — the product, quantity, or where you'll use it — and I'll find suppliers that fit.", cards:['find', 'best', 'rfq'] };
+var ID_SHORT = 'Jack_Lee', ID_LONG = 'jack-lee-international-trading-2026';
+function welBack(id, desc, cards){ return { h:'Welcome back, <span class="wid">' + esc(id) + '</span>', p:desc, cards:cards }; }
 var ATTRS = [
   { name:'Motor power', vals:['Under 500W', '500W–1000W', 'Over 1000W'] },
   { name:'Battery', vals:['Lithium', 'Lead-acid'] },
   { name:'Use', vals:['City commute', 'Fat tire / off-road', 'Cargo / 3-wheel'] }
 ];
 var INQ = 'Send inquiry for this product';
-function welcome(){
-  dlg.classList.add('top');
+var STD_SUGS = ['Which of these has the lowest MOQ?', 'Do any of them offer free samples?'];
+function resetConv(){ dlg.innerHTML = ''; dlg.classList.remove('top'); shown = []; busy = false; S.failNext = false; ta.value = ''; S.att = null; setQuota(false); renderAtt(); layout(); sync(); AVS.forEach(function(o){ if (o !== ringAv && o !== capAv) freezeAv(o); }); micaRow.prev = null; }
+function welcome(cfg){
+  cfg = cfg || WEL_FIRST; S.wel = cfg;
+  dlg.innerHTML = ''; dlg.classList.add('top');
   var w = mk('div', 'wel');
-  w.innerHTML = '<div class="head"><div class="pic"><video muted playsinline preload="auto" src="assets/wave.mp4"></video></div><div class="tt"><h2>Hi, I&#39;m Mica</h2><p>Your AI Sourcing Guide on Made-in-China.com. Tell me what you&#39;re sourcing — the product, quantity, or where you&#39;ll use it — and I&#39;ll find suppliers that fit.</p></div></div><div class="ask">' +
-    WEL.map(function(c){ return '<button type="button" class="card" data-a="' + c.a + '"><span class="ci">' + ICONS[c.ic] + '</span><div><b>' + c.t + '</b><span class="d">' + c.d + '</span></div></button>'; }).join('') + '</div>';
+  w.innerHTML = '<div class="head"><div class="pic"><video muted playsinline preload="auto" src="assets/wave.mp4"></video></div><div class="tt"><h2>' + cfg.h + '</h2><p>' + cfg.p + '</p></div></div><div class="ask">' +
+    cfg.cards.map(function(k){ var c = WEL[k]; return '<button type="button" class="card" data-a="' + c.a + '"><span class="ci">' + ICONS[c.ic] + '</span><div><b>' + c.t + '</b><span class="d">' + c.d + '</span></div></button>'; }).join('') + '</div>';
   dlg.appendChild(w);
   var v = $('video', w); v.play().catch(function(){});
   $('.pic', w).addEventListener('click', function(){ v.currentTime = 0; v.play().catch(function(){}); });
   [].slice.call(w.querySelectorAll('.card')).forEach(function(b){ b.addEventListener('click', function(){ cardAct(b.dataset.a, $('b', b).textContent); }); });
+  cv.scrollTop = 0;
 }
-function toEnd(){ requestAnimationFrame(function(){ cv.scrollTo({ top:cv.scrollHeight, behavior:'smooth' }); }); }
-function buyerSays(t){ var w = $('.wel', dlg); if (w) { w.remove(); dlg.classList.remove('top'); } clearSugs(); var b = mk('div', 'buyer', '<div class="bb">' + esc(t) + '</div><div class="me">J</div>'); var turn = mk('div', 'turn'); turn.appendChild(b); dlg.appendChild(turn); toEnd(); return turn; }
+function toEnd(){ requestAnimationFrame(function(){ cv.scrollTo({ top:cv.scrollHeight, behavior:FAST ? 'auto' : 'smooth' }); }); }
+function toEndSoft(){ if (cv.scrollHeight - cv.scrollTop - cv.clientHeight < 80) cv.scrollTop = cv.scrollHeight; }
+function buyerSays(t, att){ var w = $('.wel', dlg); if (w) { w.remove(); dlg.classList.remove('top'); } clearSugs(); var b = mk('div', 'buyer', '<div class="bb">' + attBubble(att) + (t ? '<div>' + esc(t) + '</div>' : '') + '</div><div class="me">J</div>'); var turn = mk('div', 'turn'); turn.appendChild(b); dlg.appendChild(turn); toEnd(); return turn; }
 function clearSugs(){ [].slice.call(dlg.querySelectorAll('.sugs')).forEach(function(e){ e.remove(); }); }
-function sync(){ sendB.classList.toggle('on', ta.value.trim().length > 0 && !busy); }
-function grow(){ ta.style.height = 'auto'; ta.style.height = Math.min(96, ta.scrollHeight) + 'px'; sync(); }
-ta.addEventListener('input', grow);
-function send(t){ buyerSays(t); route(t); }
-function doSend(){ var t = ta.value.trim(); if (!t || busy) return; ta.value = ''; grow(); send(t); }
+function send(t){ var a = S.att; S.lastText = t; S.att = null; renderAtt(); buyerSays(t, a); route(t, a); }
+function doSend(){ var t = ta.value.trim(); if ((!t && !S.att) || busy || S.quota || ta.value.length >= 1000) return; ta.value = ''; layout(); send(t); sync(); }
 sendB.addEventListener('click', doSend);
-ta.addEventListener('keydown', function(e){ if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); doSend(); } });
-$('#plus').addEventListener('click', function(){ toast('Upload is not part of this demo'); });
 
 function cardEl(p, i, rank){
-  var e = mk('div', 'pd', (rank ? '<span class="rk">TOP ' + rank + '</span>' : '') + '<div class="im" style="background-image:url(' + p.img + ')"></div><div class="inf"><div class="pn">' + esc(p.title) + '</div><div class="pr">' + esc(p.price) + '</div><div class="mq">' + esc(p.moq) + ' (MOQ)</div></div>');
+  var rkHtml = rank ? '<span class="badge g' + rank + '">' + ICONS.medalS + 'TOP' + rank + '</span>' : '';
+  var e = mk('div', 'pd' + (rank ? ' rk' : ''), '<div class="im" style="background-image:url(' + p.img + ')"></div><div class="inf">' + rkHtml + '<div class="nm"><div class="pn">' + esc(p.title) + '</div><div class="pr">' + esc(p.price) + '</div></div><div class="mq">' + esc(p.moq) + ' (MOQ)</div></div>');
+  if (!rank) { var nm = e.querySelector('.nm'), inf = e.querySelector('.inf'); while (nm.firstChild) inf.insertBefore(nm.firstChild, nm); nm.remove(); }
   e.style.animationDelay = (i * 70) + 'ms'; e.addEventListener('click', function(){ toast('Opens the product page in the real site'); });
   return e;
 }
@@ -368,6 +488,7 @@ async function stream(el, html){
   var parts = html.split(/(<[^>]+>)/).filter(Boolean), out = '';
   for (var k = 0; k < parts.length; k++) {
     if (parts[k][0] === '<') { out += parts[k]; continue; }
+    if (FAST) { out += parts[k]; el.innerHTML = out; continue; }
     for (var i = 0; i < parts[k].length; i += 2) { out += parts[k].slice(i, i + 2); el.innerHTML = out; await wait(16); }
   }
   el.innerHTML = out;
@@ -378,27 +499,34 @@ function micaRow(parent, kind, cls){
   return { el:m, set:function(k){ setAv(o, k); } };
 }
 function bubble(m){ var a = mk('div', 'ans'); var i = mk('div', 'ans-in'); a.appendChild(i); m.appendChild(a); return i; }
+function lastTurn(){ var t = dlg.lastElementChild; if (!t || !t.classList.contains('turn') || !t.querySelector('.buyer') || t.querySelector('.mica')) { t = mk('div', 'turn'); dlg.appendChild(t); } return t; }
+/* 一条 Mica 回答：思考步骤 → 说话 → 文字／卡片／附加内容 → 追问建议 → 反馈 */
 async function answer(o){
   busy = true; sync(); clearSugs();
-  var turn = $('.turn:last-child', dlg); if (!turn || !turn.querySelector('.buyer') || turn.querySelector('.mica')) { turn = mk('div', 'turn'); dlg.appendChild(turn); }
-  var m = micaRow(turn, 'think', 'thinking'); var th = mk('div', 'think'); m.el.appendChild(th); toEnd();
-  var S = o.steps || ['Thinking…'];
-  for (var i = 0; i < S.length; i++) { var d = mk('div', 'step cur', '<span class="dot"><i></i></span><span class="tx">' + esc(S[i]) + '</span>'); th.appendChild(d); toEnd(); await wait(650); d.classList.remove('cur'); }
-  th.remove(); m.el.classList.remove('thinking'); m.set('speak');
+  var turn = lastTurn();
+  var m = micaRow(turn, o.noThink ? 'speak' : 'think', o.noThink ? '' : 'thinking');
+  if (!o.noThink) {
+    var th = mk('div', 'think'); m.el.appendChild(th); toEnd();
+    var STEPS = o.steps || ['Thinking…'];
+    for (var i = 0; i < STEPS.length; i++) { var d = mk('div', 'step cur', '<span class="dot"><i></i></span><span class="tx">' + esc(STEPS[i]) + '</span>'); th.appendChild(d); toEnd(); await wait(650); d.classList.remove('cur'); }
+    th.remove(); m.el.classList.remove('thinking'); m.set('speak');
+  }
   var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t); await stream(t, o.intro);
   if (o.cards && o.cards.length) {
     var list = mk('div', 'pl'); inn.appendChild(list);
     o.cards.forEach(function(p, i){ list.appendChild(cardEl(p, i, o.rank ? i + 1 : 0)); });
     shown = o.cards.slice(); toEnd(); await wait(250 + o.cards.length * 70);
   }
-  if (o.extra) await o.extra(inn);
+  if (o.extra) await o.extra(inn, m.el);
   m.set('idle');
   var sl = (o.sugs || []).slice();
-  if (o.cards && o.cards.length >= 2) sl = sl.slice(0, 1).concat(['Compare these side by side', 'Narrow down by specs']);
+  if (o.cards && o.cards.length >= 2 && !o.rank && !o.noSugs) sl = [sl[0] || STD_SUGS[0], STD_SUGS[1], 'Narrow down by specs'];   // 有产品的回答：第1条模型想的问题＋免费样品＋缩小规格
   if (o.cards && o.cards.length === 1) sl = [INQ];
+  if (o.noSugs) sl = o.sugs || [];
   if (sl.length) { var sg = mk('div', 'sugs'); sl.forEach(function(q, k){ var b = mk('button', 'sug', esc(q)); b.type = 'button'; b.style.animationDelay = (k * 80) + 'ms'; b.addEventListener('click', function(){ if (q === INQ) { toast('Opens the inquiry form in the real site'); } else if (!busy) send(q); }); sg.appendChild(b); }); m.el.appendChild(sg); }
   if (!o.noFb) m.el.appendChild(feedback(m.el, turn));
   busy = false; sync(); last = o; toEnd();
+  return m;
 }
 function feedback(host, turn){
   var fb = mk('div', 'fb', '<button type="button" data-k="up">' + ICONS.thumbUp + '</button><button type="button" data-k="down">' + ICONS.thumbDown + '</button><button type="button" data-k="redo">' + ICONS.refresh + '</button>');
@@ -409,72 +537,170 @@ function feedback(host, turn){
   });
   return fb;
 }
-var SUG2 = ['Which of these has the lowest MOQ?'];
+var VOCAB = /bik|bicycl|electric|scooter|moped|motor|batter|lithium|tricycle|e-?bike|wheel|tire|tyre|adult|cargo|commut|city|fat|lead/i;
 function pickProducts(text, n){
   var w = (text.toLowerCase().match(/[a-z]{3,}/g) || []), score = PRODUCTS.map(function(p, i){ var s = 0; w.forEach(function(x){ if (p.title.toLowerCase().indexOf(x) > -1) s += 2; }); return { p:p, s:s - i * 0.01 }; });
   score.sort(function(a, b){ return b.s - a.s; }); return score.slice(0, n).map(function(x){ return x.p; });
 }
 function moqNum(p){ return parseInt(p.moq, 10) || 9999; }
-async function route(text){
-  var q = text.toLowerCase();
+async function route(text, att){
+  var q = (text || '').toLowerCase();
   if (/lowest moq|smallest moq|minimum order/.test(q)) {
     var src = shown.length ? shown : PRODUCTS.slice(0, 6), best = src.slice().sort(function(a, b){ return moqNum(a) - moqNum(b); })[0];
     return answer({ intro:'The lowest MOQ among these is ' + esc(best.moq) + ':', cards:[best], steps:['Thinking…', 'Comparing MOQ across the products'] });
   }
-  if (/compare/.test(q)) return compare();
+  if (/free samples?/.test(q)) {
+    var src2 = shown.length ? shown : PRODUCTS.slice(0, 6), withS = src2.slice(0, 3);
+    return answer({ intro:'These suppliers offer free samples — you may only pay for shipping:', cards:withS, steps:['Thinking…', 'Checking sample policies'], sugs:[STD_SUGS[0]] });
+  }
   if (/narrow|specs/.test(q)) return attrsTurn();
-  if (/another batch|more products/.test(q)) return batch();
-  if (/best sell|trending/.test(q)) return answer({ intro:'Here’s what’s trending for <b>electric bicycle</b>:', cards:PRODUCTS.slice(0, 3), rank:true, steps:['Thinking…', 'Checking the Best Selling list'] });
-  if (/quotation|rfq|request/.test(q)) return rfq();
-  return answer({ intro:'These match what you described:', cards:pickProducts(text, 6), steps:['Thinking…', 'Understanding: ' + text.slice(0, 40), 'Searching and comparing products on Made-in-China.com'], sugs:SUG2 });
+  if (/best sell|trending/.test(q)) return startA2(true);
+  if (/quotation|rfq|post a request/.test(q)) return rfq();
+  if (/^error/.test(q)) return failAnswer(0, /fail/.test(q));
+  if (/quota/.test(q)) { setQuota(true); return; }
+  var noRes = /camera|solar|12v|zzz/.test(q) || (text && text.length > 2 && !VOCAB.test(text) && !att);
+  if (noRes) return noResult();
+  return answer({ intro:'These match what you described:', cards:pickProducts(text, 6), steps:['Thinking…', 'Understanding: ' + (text || 'your file').slice(0, 40), 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
 }
 async function cardAct(a, text){
   if (busy) return; buyerSays(text);
-  if (a === 'find') return answer({ intro:ASK, steps:['Thinking…'], noFb:true });
-  if (a === 'best') return route('best selling');
+  if (a === 'find' || a === 'new') return answer({ intro:'Sure. Tell me what you’re sourcing — the product, quantity, or where you’ll use it — and I’ll find suppliers that fit.', steps:['Thinking…'], noFb:true });
+  if (a === 'best') return startA2(true);
   if (a === 'rfq') return rfq();
+  if (a === 'good') return answer({ intro:'Glad to hear that! What are you sourcing next?', steps:['Thinking…'], noFb:true });
+  if (a === 'notq') return answer({ intro:'Sorry about that. Here are some others — tell me what was missing and I’ll narrow it down.', cards:PRODUCTS.slice(3, 9), steps:['Thinking…', 'Finding related products', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
+  if (a === 'cont') return answer({ intro:'Picking up where we left off — these electric bicycles match what you chose last time:', cards:PRODUCTS.slice(0, 6), steps:['Thinking…', 'Recalling your last request', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
+}
+/* 主动触发：A1 属性选项（内容1）、内容2、A2 榜单 */
+async function startA1(){
+  var turn = mk('div', 'turn'); dlg.appendChild(turn);
+  var m = micaRow(turn, 'speak'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  await stream(t, 'The results for “' + esc(QUERY) + '” cover a lot of ground. Let’s narrow them down — which of these matter to you?');
+  attrsBox(inn, m); m.set('idle'); toEnd();
 }
 async function attrsTurn(){
   busy = true; sync(); clearSugs();
-  var turn = $('.turn:last-child', dlg); var m = micaRow(turn, 'speak'); var inn = bubble(m.el);
+  var turn = lastTurn(); var m = micaRow(turn, 'speak'); var inn = bubble(m.el);
   var t = mk('div', 't'); inn.appendChild(t); await stream(t, 'Sure — which of these matter to you?');
+  attrsBox(inn, m); m.set('idle'); busy = false; sync(); toEnd();
+}
+function attrsBox(inn, m){
   var box = mk('div', 'attrs'), sel = {}; inn.appendChild(box);
   var go = mk('button', 'pbtn', 'Show matching products'); go.disabled = true;
   ATTRS.forEach(function(g){ var gr = mk('div', 'row'); gr.appendChild(mk('div', 'gn', esc(g.name))); var vs = mk('div', 'vals'); gr.appendChild(vs);
     g.vals.forEach(function(v){ var b = mk('button', 'chip', esc(v)); b.type = 'button'; b.addEventListener('click', function(){ var s = sel[g.name] = sel[g.name] || [], k = s.indexOf(v); if (k > -1) { s.splice(k, 1); b.classList.remove('sel'); } else { s.push(v); b.classList.add('sel'); } go.disabled = !Object.keys(sel).some(function(n){ return sel[n].length; }); }); vs.appendChild(b); });
     box.appendChild(gr); });
-  box.appendChild(go); m.set('idle'); busy = false; sync(); toEnd();
-  go.addEventListener('click', function(){ if (busy || go.disabled) return; var picked = []; Object.keys(sel).forEach(function(n){ picked = picked.concat(sel[n]); }); box.classList.add('lock'); go.remove(); buyerSays(picked.join(' · ')); answer({ intro:'Got it. These match what you picked:', cards:pickProducts(picked.join(' '), 6), steps:['Thinking…', 'Understanding: ' + picked.join(', '), 'Searching and comparing products on Made-in-China.com'], sugs:SUG2 }); });
+  box.appendChild(go);
+  go.addEventListener('click', function(){ if (busy || go.disabled) return; var picked = []; Object.keys(sel).forEach(function(n){ picked = picked.concat(sel[n]); }); box.classList.add('lock'); go.style.display = 'none'; buyerSays(picked.join(' · ')); answer({ intro:'Got it. These match what you picked:', cards:pickProducts(picked.join(' '), 6), steps:['Thinking…', 'Understanding: ' + QUERY + ', ' + picked.join(', '), 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] }); });
 }
-async function compare(){
-  var items = (shown.length >= 2 ? shown : PRODUCTS.slice(0, 6)).slice(0, 6);
-  return answer({ intro:'Here they are side by side:', steps:['Thinking…', 'Comparing price and MOQ'], noFb:true, extra:async function(inn){
-    var wrap = mk('div'); wrap.style.cssText = 'overflow-x:auto;-webkit-overflow-scrolling:touch';
-    var tb = mk('div', 'cmp'); tb.style.cssText = '--n:' + items.length + ';min-width:' + (56 + items.length * 96) + 'px';
-    var row = function(label, cell){ var r = mk('div', 'r'); r.appendChild(mk('div', 'h', label)); items.forEach(function(c){ r.appendChild(mk('div', 'c', cell(c))); }); tb.appendChild(r); };
-    row('Product', function(c){ return '<img src="' + c.img + '" alt=""><div class="pn">' + esc(c.title) + '</div>'; });
-    row('Price', function(c){ return '<div class="pp">' + esc(c.price).replace(/-(?=\S)/, '-<br>') + '</div>'; });
-    row('MOQ', function(c){ return esc(c.moq); });
-    wrap.appendChild(tb); inn.appendChild(wrap);
-    var b1 = mk('button', 'sug', 'Compare and Get a Quote'), b2 = mk('button', 'sug', 'Show Another Batch of Products'); b1.type = b2.type = 'button';
-    b1.addEventListener('click', function(){ toast('Opens the compare page in the real site'); });
-    b2.addEventListener('click', function(){ if (busy) return; send('Show Another Batch of Products'); });
-    inn.appendChild(b1); inn.appendChild(b2); await wait(200); } });
+async function startA1b(){
+  var turn = mk('div', 'turn'); dlg.appendChild(turn); var m = micaRow(turn, 'speak'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  await stream(t, 'Tell me everything you need for ' + esc(QUERY) + ' — use, size, quantity, budget — and I’ll find the closest match.'); m.set('idle'); toEnd();
 }
-var batchN = 0;
-async function batch(){
-  batchN++; var off = (batchN * 3) % PRODUCTS.length, more = []; for (var i = 0; i < 6; i++) more.push(PRODUCTS[(off + i) % PRODUCTS.length]);
-  return answer({ intro:'Here are more products similar to these:', cards:more, steps:['Thinking…', 'Finding related products'], sugs:SUG2 });
+async function startA2(asReply){
+  var turn = asReply ? lastTurn() : mk('div', 'turn'); if (!asReply) dlg.appendChild(turn);
+  var m = micaRow(turn, 'speak'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  await stream(t, asReply ? 'Here’s what’s trending for <b>' + esc(QUERY) + '</b>:' : 'Still undecided? Check out what’s trending:');
+  var list = mk('div', 'pl'); inn.appendChild(list); PRODUCTS.slice(0, 3).forEach(function(p, i){ list.appendChild(cardEl(p, i, i + 1)); }); shown = PRODUCTS.slice(0, 3);
+  m.set('idle'); toEnd();
+}
+/* 没结果 → 发布采购需求（RFQ 表单）；出错；重试仍失败 */
+async function noResult(){
+  return answer({ intro:'I couldn’t find products that match all of that. You can loosen one requirement, or let suppliers come to you with quotes.', steps:['Thinking…', 'Searching and comparing products on Made-in-China.com'], noFb:true, noSugs:true, sugs:['Show electric bicycles instead', 'Show products with fewer requirements'],
+    extra:async function(inn){ var b = mk('button', 'pbtn', 'Post a Request for Quotation'); b.type = 'button'; b.addEventListener('click', function(){ if (busy) return; b.disabled = true; buyerSays('Post a Request for Quotation'); rfq(); }); inn.appendChild(b); } });
 }
 async function rfq(){
-  return answer({ intro:'Tell me what you need and I’ll write it up as a request for quotation.', steps:['Thinking…'], noFb:true, extra:async function(inn){
-    var f = mk('div', 'form', '<div><label>Product</label><input value="Electric bicycle"></div><div><label>Quantity</label><input value="500 Pieces"></div><div><label>Details</label><textarea rows="3">48V lithium battery, 500W motor, for city commuting.</textarea></div>');
-    var go = mk('button', 'pbtn', 'Submit request'); go.addEventListener('click', function(){ go.disabled = true; toast('Request submitted (demo)'); });
-    f.appendChild(go); inn.appendChild(f); } });
+  var base = S.lastText && !/quotation|request/i.test(S.lastText) ? S.lastText : '';
+  return answer({ intro:'Sure. Check the details below, then submit your request. Suppliers will send quotes to your email.', steps:['Thinking…'], noFb:true, noThink:false,
+    extra:async function(inn, host){
+      var f = mk('div', 'rfq');
+      var name = base ? base.replace(/^i\s+(need|want|am looking for)\s+(a|an|some)?\s*/i, '').split(/,| with | for /i)[0].replace(/[.。]$/, '').slice(0, 60) : '', det = base ? 'Hello, I am looking for a supplier for ' + base.replace(/^i\s+(need|want|am looking for)\s+(a|an|some)?\s*/i, '').replace(/[.。]$/, '') + '. Please provide your best quote and available options for this product. I look forward to your response and hope we can establish a good business relationship.' : '';
+      f.innerHTML = '<div><h3>Your requirement details</h3><p class="hint">Get competitive quotes from verified suppliers at Made-in-China.com by posting your request. All quotes will be sent to your email.</p></div>' +
+        '<div class="f"><label><i>*</i>Product name</label><input class="in" id="rf-n" value="' + esc(name) + '" placeholder="e.g. electric bicycle"></div>' +
+        '<div class="f"><label><i>*</i>Detail</label><div class="dt"><button type="button" class="ai" id="rf-ai">' + ICONS.star + 'Regenerate with AI</button><textarea id="rf-d" maxlength="2000" placeholder="Describe what you need">' + esc(det) + '</textarea><div class="bt"><button type="button" class="sug" id="rf-up" style="animation:none">Upload images or files (0/3)</button><span class="cnt2" id="rf-c">0 / 2000</span></div></div></div>' +
+        '<div class="f"><label><i>*</i>Order quantity</label><div class="qty"><input class="in" id="rf-q" inputmode="numeric" value="' + (base ? '20' : '') + '" placeholder="Quantity"><div class="sel"><select id="rf-u"><option>Piece(s)</option><option>Set(s)</option><option>Pair(s)</option></select>' + ICONS.down + '</div></div></div>' +
+        '<button type="button" class="pbtn lg" id="rf-s">Submit</button>';
+      host.appendChild(f);   // 表单卡是回答气泡的兄弟，宽 343（Figma 453:6448）
+      var d = $('#rf-d', f), c = $('#rf-c', f), upN = 0;
+      var cnt = function(){ c.textContent = d.value.length + ' / 2000'; }; cnt(); d.addEventListener('input', cnt);
+      var VARS = ['Hello, I am looking for a reliable supplier. Please send your best price, MOQ, lead time and sample policy. We plan to place regular orders if quality and delivery meet our needs.', 'Hi, we are sourcing this product for our local market. Could you share detailed specifications, certifications and your best FOB quote? Thank you.'];
+      var vi = 0; $('#rf-ai', f).addEventListener('click', function(){ d.value = (name ? 'Hello, I am looking for a supplier for ' + name + '. ' : '') + VARS[vi++ % VARS.length]; cnt(); });
+      $('#rf-up', f).addEventListener('click', function(){ if (upN >= 3) { toast('You can upload up to 3 files'); return; } var fi = document.createElement('input'); fi.type = 'file'; fi.accept = $('#file').accept; fi.onchange = function(){ var x = fi.files[0]; if (!x) return; if (x.size > 5 * 1048576) { toast('File is too large (max 5MB)'); return; } upN++; $('#rf-up', f).textContent = 'Upload images or files (' + upN + '/3)'; }; fi.click(); });
+      $('#rf-s', f).addEventListener('click', function(){
+        var n = $('#rf-n', f), q = $('#rf-q', f), bad = false;
+        [n, q].forEach(function(e){ var e0 = !e.value.trim(); e.classList.toggle('err', e0); bad = bad || e0; });
+        if (!d.value.trim()) bad = true;
+        if (bad) { toast('Please complete the required fields'); return; }
+        $('#rf-s', f).disabled = true; f.style.opacity = '.6'; f.style.pointerEvents = 'none';
+        buyerSays('Submit'); answer({ intro:'Your request has been submitted. Suppliers will send quotes to your email.', noThink:true, noFb:true });
+      });
+    } });
 }
+async function failAnswer(n, again){
+  busy = true; sync();
+  var turn = lastTurn(); var m = micaRow(turn, 'think', 'thinking'); var th = mk('div', 'think'); m.el.appendChild(th);
+  var d = mk('div', 'step cur', '<span class="dot"><i></i></span><span class="tx">Thinking…</span>'); th.appendChild(d); toEnd(); await wait(900); th.remove(); m.el.classList.remove('thinking'); m.set('idle');
+  var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  if (n === 0) {
+    await stream(t, 'Sorry, I couldn’t finish that. Please try again.');
+    var b = mk('button', 'pbtn', 'Try again'); b.type = 'button'; inn.appendChild(b);
+    b.addEventListener('click', function(){ if (busy) return; b.remove(); failAnswer(again ? 1 : 2, again); });
+  } else if (n === 1) {
+    await stream(t, 'Sorry, I still couldn’t finish that. If you need assistance from a human representative, please click the button below.');
+    var l = mk('button', 'lnk', 'Customer Service' + ICONS.rightBig); l.type = 'button'; l.addEventListener('click', function(){ toast('Opens Customer Service in the real site'); }); inn.appendChild(l);
+  } else {
+    var tx = $('.mica:last-child', turn); m.el.remove(); busy = false; sync(); return answer({ intro:'These match what you described:', cards:pickProducts(S.lastText || '', 6), steps:['Thinking…', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
+  }
+  busy = false; sync(); toEnd();
+}
+/* 额度：游客用完 */
+function setQuota(on){
+  S.quota = on; inp.classList.toggle('quota', on); $('#login').classList.toggle('on', on);
+  ta.disabled = on; $('#plus').disabled = on || !!S.att; sendB.classList.remove('on');
+  ta.placeholder = on ? 'You have used up your allotted number of conversations, please log in to continue.' : 'Tell Mica what you are looking for…';
+  if (on) { sendB.style.opacity = '.4'; inp.classList.add('multi'); } else { sendB.style.opacity = ''; }
+  layout(); sync();
+}
+$('#login').addEventListener('click', function(){ toast('Opens the Log In page in the real site'); });
 
-window.__demo = { setCap:setCap, openPanel:openPanel, closePanel:closePanel };   // 仅供自检／演示脚本用
-/* ══ 5. 首次打开：提示「加到主屏幕」 ══ */
+/* ══ 6. 演示场景表：长按助手页标题或入口圆圈 ══ */
+function openPickerScene(fn){ $('#picker').classList.remove('on'); FAST = false; fn(); }
+function scn(label, fn){ return { l:label, fn:fn }; }
+function typed(text, att){ ta.value = text; if (att) S.att = att; renderAtt(); layout(); sync(); }
+var SCENES = [
+  { g:'开场与再次打开', items:[
+    scn('开场 · 点入口打开', function(){ resetConv(); welcome(WEL_FIRST); }),
+    scn('再次打开 · 问候', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Good to see you again.<br>What are you sourcing today?', ['find', 'best'])); }),
+    scn('再次打开 · 买家ID过长', function(){ resetConv(); welcome(welBack(ID_LONG, 'Good to see you again.<br>What are you sourcing today?', ['find', 'best'])); }),
+    scn('再次打开 · 问上次的结果', function(){ resetConv(); welcome(welBack(ID_SHORT, 'What are you sourcing today?<br>Were you happy with the products I found for you last time?', ['good', 'notq', 'newp'])); }),
+    scn('再次打开 · 接着上次的采购', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Last time we were looking for electric bicycles.<br>Would you like to pick up where we left off?', ['cont', 'fresh'])); }) ] },
+  { g:'主动触发（点提示胶囊后）', items:[
+    scn('A1 · 属性选项', function(){ resetConv(); startA1(); }),
+    scn('A1 · 内容2', function(){ resetConv(); startA1b(); }),
+    scn('A2 · 榜单 TOP3', function(){ resetConv(); startA2(); }) ] },
+  { g:'对话', items:[
+    scn('回答完成（6 款 + 追问 + 反馈）', function(){ resetConv(); var t = buyerSays('I need waterproof electric bikes for city commuting, about 200 pieces.'); S.lastText = 'electric bike city commuting'; route('electric bike city commuting'); }),
+    scn('只有 1 款产品', function(){ resetConv(); shown = PRODUCTS.slice(0, 6); buyerSays('Which of these has the lowest MOQ?'); route('Which of these has the lowest MOQ?'); }),
+    scn('没结果 → 发布采购需求', function(){ resetConv(); S.lastText = 'I need a 12V solar-powered LED flood light with a built-in camera, 20 pieces.'; buyerSays(S.lastText); route(S.lastText); }),
+    scn('出错 → 重试', function(){ resetConv(); buyerSays('error test'); route('error test'); }),
+    scn('出错 → 重试仍失败', function(){ resetConv(); buyerSays('error fail'); route('error fail'); }) ] },
+  { g:'额度', items:[ scn('额度 · 游客用完', function(){ resetConv(); buyerSays('I need waterproof LED flood lights for a parking lot, about 50 pieces.'); setQuota(true); }) ] },
+  { g:'输入框', items:[
+    scn('已选图片', function(){ resetConv(); welcome(WEL_FIRST); typed('', { kind:'img', name:'photo.jpg', size:'860 KB', url:'assets/p1.jpg' }); }),
+    scn('已选文件', function(){ resetConv(); welcome(WEL_FIRST); typed('', { kind:'file', name:'Product-spec.pdf', size:'1.2 MB', url:'' }); }),
+    scn('4 行（最高）', function(){ resetConv(); welcome(WEL_FIRST); typed('Waterproof electric bikes for city commuting, about 200 pieces, IP65 or higher, lithium battery, 500W motor, delivery to Los Angeles within 30 days, please quote FOB and CIF.'); }),
+    scn('超过 4 行（框内滚动）', function(){ resetConv(); welcome(WEL_FIRST); typed(new Array(8).join('Waterproof electric bikes for city commuting, about 200 pieces, IP65 or higher. ')); }),
+    scn('打满 1000 字', function(){ resetConv(); welcome(WEL_FIRST); var s = ''; while (s.length < 1000) s += 'Waterproof electric bike for city commuting, about 200 pieces. '; typed(s.slice(0, 1000)); }),
+    scn('上传失败 · 超过 5MB', function(){ resetConv(); welcome(WEL_FIRST); toast('File is too large (max 5MB)'); }),
+    scn('上传失败 · 格式不支持', function(){ resetConv(); welcome(WEL_FIRST); toast('Unsupported file type'); }) ] }
+];
+(function(){ var pk = $('#pk'); SCENES.forEach(function(g){ pk.appendChild(mk('div', 'g', g.g)); g.items.forEach(function(it){ var b = mk('button', 'it', esc(it.l)); b.type = 'button'; b.addEventListener('click', function(){ $('#picker').classList.remove('on'); if (!panelOpen) openPanel('none'); it.fn(); }); pk.appendChild(b); }); }); })();
+$('#picker').addEventListener('click', function(e){ if (e.target === this) this.classList.remove('on'); });
+function showPicker(){ $('#picker').classList.add('on'); }
+onLong($('#ptitle'), showPicker); onLong(ring, showPicker);
+window.__demo = { setCap:setCap, openPanel:openPanel, closePanel:closePanel, scenes:SCENES, fast:function(v){ FAST = v; } };   // 自检／演示脚本用
+
+/* ══ 7. 首次打开：提示「加到主屏幕」 ══ */
 (function(){
   var standalone = window.navigator.standalone || matchMedia('(display-mode: standalone)').matches;
   var seen = false; try { seen = localStorage.getItem('hh') === '1'; } catch (e) {}
