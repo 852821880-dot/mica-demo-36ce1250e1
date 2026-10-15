@@ -46,12 +46,12 @@ svg{display:block}
 #top{position:fixed;right:8px;bottom:86px;width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--line);box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;color:var(--ink3);opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
 #top.on{opacity:1;pointer-events:auto}
 /* ── 入口圆圈＋提示胶囊。滑动时整体完全收起（连描边和投影），停下 0.5 秒后回来（Figma 661:6745） ── */
-#entry{position:fixed;right:8px;bottom:134px;z-index:30;width:48px;height:48px;transition:transform .2s ease-out}
-#entry.away{transform:translateX(120px)}
+#entry{position:fixed;right:8px;bottom:134px;z-index:30;width:48px;height:48px;transform-origin:100% 50%;transition:transform .5s cubic-bezier(.34,1.32,.64,1),opacity .5s ease-out}   /* 回来：500ms，缓出带轻微回弹 */
+#entry.away{transform:translateX(120px) scale(.7);opacity:0;transition:transform .4s cubic-bezier(.5,0,.75,0),opacity .4s ease-in}   /* 收起：400ms，缓入，边向右移边缩小淡出，完全移出屏幕 */
 #ring{position:absolute;right:0;bottom:0;width:48px;height:48px;border-radius:50%;padding:2px;background:linear-gradient(135deg,#007dfa,#5b6cff,#8b5cf6);box-shadow:0 5px 12px 4px rgba(0,0,0,.08),0 3px 6px rgba(0,0,0,.12),0 1px 2px -2px rgba(0,0,0,.1);transition:opacity .2s}
 #ring .av2{width:100%;height:100%}
 /* 提示胶囊 366:5274：277×50＋外描边 2；头像 42；padding 4/16/4/4；间距 8 */
-#cap{position:absolute;right:-2px;bottom:-2px;height:54px;width:54px;overflow:hidden;opacity:0;pointer-events:none;border:2px solid transparent;border-radius:1000px;background:linear-gradient(90deg,#e6eeff,#efe8ff) padding-box,linear-gradient(135deg,#007dfa,#5b6cff,#8b5cf6) border-box;box-shadow:0 5px 12px 4px rgba(0,0,0,.08),0 3px 6px rgba(0,0,0,.12),0 1px 2px -2px rgba(0,0,0,.1);display:flex;align-items:center;gap:8px;padding:4px 16px 4px 4px;transition:width .4s cubic-bezier(.2,.7,.2,1),opacity .2s}
+#cap{position:absolute;right:-2px;bottom:-2px;height:54px;width:54px;overflow:hidden;opacity:0;pointer-events:none;border:2px solid transparent;border-radius:1000px;background:linear-gradient(90deg,#e6eeff,#efe8ff) padding-box,linear-gradient(135deg,#007dfa,#5b6cff,#8b5cf6) border-box;box-shadow:0 5px 12px 4px rgba(0,0,0,.08),0 3px 6px rgba(0,0,0,.12),0 1px 2px -2px rgba(0,0,0,.1);display:flex;align-items:center;gap:8px;padding:4px 16px 4px 4px;transition:width .6s cubic-bezier(.22,.8,.3,1),opacity .35s}   /* 胶囊展开 600ms */
 #cap.on{width:281px;opacity:1;pointer-events:auto}
 #cap .av{flex:none;width:42px;height:42px;border-radius:50%;overflow:hidden;background:#6aa8ff;box-shadow:0 5px 12px 4px rgba(0,0,0,.08),0 3px 6px rgba(0,0,0,.12),0 1px 2px -2px rgba(0,0,0,.1)}
 #cap .av .av2{width:100%;height:100%}
@@ -82,7 +82,7 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
 .buyer .bb .th{width:60px;height:60px;border-radius:8px;background:#fff center/cover no-repeat}
 .buyer .me{flex:none;width:28px;height:28px;border-radius:50%;background:#71cadc;color:#fff;font-size:14px;font-weight:700;line-height:16px;display:flex;align-items:center;justify-content:center}
 .mica{display:flex;flex-direction:column;gap:8px}
-.mica.thinking{gap:6px}
+.mica.thinking,.mica.g6{gap:6px}   /* 主动触发的回答（无买家消息）身份行与气泡间距 6，其余 8 */
 .who{display:flex;align-items:center;gap:8px;height:28px}
 .who .av{width:28px;height:28px;flex:none}
 /* Mica 头像：四种状态（待机／打招呼／思考中／说话中）叠在一起，切换时 200ms 淡入淡出 */
@@ -97,7 +97,7 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
 .pd{display:flex;align-items:center;gap:10px;padding:10px;background:#fff;border:1px solid var(--card-line);border-radius:8px;animation:up .3s both}
 .pd .im{flex:none;width:80px;height:80px;border-radius:4px;background:var(--bg) center/cover no-repeat}
 .pd .inf{flex:1;min-width:0;display:flex;flex-direction:column;gap:0}
-.pd .pn{font-size:12px;line-height:18px;color:var(--ink);max-height:36px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.pd .pn{font-size:12px;line-height:18px;color:var(--ink);max-height:36px;overflow:hidden;word-break:normal}   /* 超过 2 行按字符截断（Figma：…Light Gar…），由 clampAll 处理 */
 .pd .pr{font-size:16px;line-height:24px;font-weight:700;color:var(--ink);margin-bottom:2px}
 .pd .mq{font-size:12px;line-height:18px;color:var(--ink3)}
 /* 榜单卡片 358:4811：高 108，信息列间距 4，名次角标 63×22 */
@@ -249,7 +249,7 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
 <div class="sticky">
   <div class="hd">
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 3.5 6 10l6.5 6.5" stroke="#222" stroke-width="1.6"/></svg>
-    <div class="sbox"><span>electric bicycle</span><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2.5" y="5.5" width="17" height="12" rx="2" stroke="#222" stroke-width="1.5"/><circle cx="11" cy="11.5" r="3.3" stroke="#222" stroke-width="1.5"/><path d="M7.5 5.5 8.6 3.5h4.8l1.1 2" stroke="#222" stroke-width="1.5"/></svg></div>
+    <div class="sbox"><span>outdoor LED light</span><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2.5" y="5.5" width="17" height="12" rx="2" stroke="#222" stroke-width="1.5"/><circle cx="11" cy="11.5" r="3.3" stroke="#222" stroke-width="1.5"/><path d="M7.5 5.5 8.6 3.5h4.8l1.1 2" stroke="#222" stroke-width="1.5"/></svg></div>
   </div>
   <div class="tabs"><span class="on">Products</span><span>Suppliers</span><svg class="g" width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="3" width="6" height="6" stroke="#555" stroke-width="1.4"/><rect x="2" y="12" width="6" height="6" stroke="#555" stroke-width="1.4"/><path d="M11 5h7M11 8h5M11 14h7M11 17h5" stroke="#555" stroke-width="1.4"/></svg></div>
   <div class="chips"><span>⛛</span><span class="st">Secured Trading</span><span>Audited</span><span>Manufacturer</span><span>Certified</span><span>Gold Member</span></div>
@@ -287,7 +287,8 @@ body.in-panel #page,body.in-panel #top,body.in-panel #entry{display:none}
 <div id="home-hint">Tap <u>Share</u> → <u>Add to Home Screen</u> to open this demo full-screen, even offline. <u id="hh-x" style="float:right">OK</u></div>
 
 <script>
-var PRODUCTS = [{"id": 1, "title": "16inch 48V 1000W Fat Tire Electric Bike Lithium Battery E Bicycle Motorcycle Fat Tyre City Leisure U2", "price": "US$245.00-289.00", "moq": "10 Pieces", "co": "Linyi Huanyu Jindong New Energy Technology Co., Ltd.", "img": "assets/p1.jpg"}, {"id": 2, "title": "2000W Powerful Motor U2 Lithium or Acid Battery Electric Bike /Motorcycle/E-Bike/Electric Bicycle/Moped for Long Distance Daily Commute Trips", "price": "US$189.00-359.00", "moq": "50 Pieces", "co": "Linyi Lansheng New Energy Electric Vehicle Co., Ltd", "img": "assets/p2.jpg"}, {"id": 3, "title": "New 2026 Hot Sale High Quality Cheap Electric Bicycle for Adults", "price": "US$214.00-239.00", "moq": "2 Pieces", "co": "Linyi Waytop New Energy Co., Ltd.", "img": "assets/p3.jpg"}, {"id": 4, "title": "EB S1E Electric Motorbike EEC L1 NCM Lithium 500W/750W LUYUAN electric vehicle electric bicycle", "price": "US$798.00", "moq": "100 Pieces", "co": "Zhejiang Luyuan Electric Vehicle Co., Ltd.", "img": "assets/p4.jpg"}, {"id": 5, "title": "All Terrain Cheap Electric Scooter Moto Adventure E-Bike for Sale", "price": "US$205.00-318.00", "moq": "50 Sets", "co": "BLITZBEAR E MOTO CO., LTD.", "img": "assets/p5.jpg"}, {"id": 6, "title": "Bicicleta Elctrica 72V Battery 1000W Two Wheels Electric Bicycle", "price": "US$215.00-335.00", "moq": "10 Pieces", "co": "Shandong Jingpin Electric Vehicle Technology Co., Ltd.", "img": "assets/p6.jpg"}, {"id": 7, "title": "Strong and Robust Yuedong Customizable 60V 20ah E-Bicycle for Green Travel", "price": "US$200.00-250.00", "moq": "30 Unit", "co": "Taizhou Yiku New Energy Technology Co., Ltd.", "img": "assets/p7.jpg"}, {"id": 8, "title": "Myatu Manufacture 750W Front Motor Fat Tire 3 Wheel E Bike Tricycle", "price": "US$600.00-900.00", "moq": "10 piece", "co": "Guangzhou Yiso Ebike Co., Ltd.", "img": "assets/p8.jpg"}, {"id": 9, "title": "Custom Manufacturer Private Brand Custom Color Electric Lightweight Motor Bike for Retail Chain Electric Motorbike Buyer", "price": "US$750.00-850.00", "moq": "10 Pieces", "co": "Wuxi Winboard Intelligent Technology Co., Ltd.", "img": "assets/p9.jpg"}];
+var PRODUCTS = [{"id":1,"title":"100W 150W 200W 300W 400W Sport Filed Outdoor LED Stadium Light Garden Landscape Tennis Court Yard IP67 Waterproof Dustproof LED Flood Light","price":"US$21.00-119.00","moq":"1 Piece","img":"assets/led1.png"},{"id":2,"title":"50W~300W Painted Matte Zijun Carton Customizable Pole Height Avaliable LED Solar Outdoor Light","price":"US$28.80-58.80","moq":"2 Pieces","img":"assets/led2.png"},{"id":3,"title":"20 25 30 Meter Height High Mast Light LED Flood Light","price":"US$200.00-250.00","moq":"1 Set","img":"assets/led3.png"}]
+;
 var ICONS = {
   close:'<svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11.0025 11.973L17.3129 18.2833L18.2852 17.311L11.9748 11.0007L18.2918 4.6837L17.3195 3.71143L11.0025 10.0284L4.691 3.71688L3.71875 4.68915L10.0303 11.0007L3.71992 17.311L4.69222 18.2833L11.0025 11.973Z" fill="#222222"/></svg>',
   search:'<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.21875 2.5C12.9294 2.5 15.9375 5.50809 15.9375 9.21875C15.9375 10.849 15.3566 12.3436 14.3909 13.5071L17.4854 16.6016L16.6016 17.4854L13.5071 14.3909C12.3436 15.3566 10.849 15.9375 9.21875 15.9375C5.50809 15.9375 2.5 12.9294 2.5 9.21875C2.5 5.50809 5.50809 2.5 9.21875 2.5ZM9.21875 3.75C6.19844 3.75 3.75 6.19844 3.75 9.21875C3.75 12.2391 6.19844 14.6875 9.21875 14.6875C12.2391 14.6875 14.6875 12.2391 14.6875 9.21875C14.6875 6.19844 12.2391 3.75 9.21875 3.75Z" fill="#222222"/></svg>',
@@ -321,11 +322,13 @@ function toast(t){ var e = $('#toast'); e.textContent = t; e.classList.add('on')
 
 /* ══ 1. 搜索结果页 ══ */
 var grid = $('#grid');
-PRODUCTS.forEach(function(p){
+/* 演示商品＝Figma 榜单里的三款 LED 灯（图取自 Figma 节点 358:4826／4837／4848）；搜索结果页底图轮着铺 */
+var ASSIST = [0, 1, 2, 0, 1, 2].map(function(i){ return PRODUCTS[i]; });
+for (var gi = 0; gi < 12; gi++) { var p = PRODUCTS[gi % 3];
   grid.appendChild(mk('div', 'pc', '<div class="im" style="background-image:url(' + p.img + ')"></div><div class="tx"><div class="tt">' + esc(p.title) + '</div><div class="pr">' + esc(p.price) + '</div><div class="mq">' + esc(p.moq) + ' (MOQ)</div><div class="au">Audited</div></div>'));
-});
+}
 $('#top').addEventListener('click', function(){ window.scrollTo({ top:0, behavior:'smooth' }); });
-var QUERY = 'electric bicycle';
+var QUERY = 'outdoor LED light';
 
 /* ══ 2. 入口：滑动时完全收起，停下 0.5 秒后回来 ══ */
 var entry = $('#entry'), cap = $('#cap'), ring = $('#ring'), idleT = null, capSeen = false, panelOpen = false;
@@ -416,7 +419,7 @@ function layout(){
   if (!multi && !need) { ta.style.height = 'auto'; if (ta.scrollHeight > 28) need = true; }
   if (need) inp.classList.add('multi');
   else if (!ta.value && !S.att) inp.classList.remove('multi');
-  ta.style.height = 'auto'; ta.style.height = Math.min(96, Math.max(24, ta.scrollHeight)) + 'px';
+  if (!S.quota) { ta.style.height = 'auto'; ta.style.height = Math.min(96, Math.max(24, ta.scrollHeight)) + 'px'; }
   inp.classList.toggle('over', ta.value.length >= 1000);
   if (cv && panelOpen) toEndSoft();
 }
@@ -443,16 +446,16 @@ var WEL = {
   good:{ ic:'search', t:'Yes, they were a good fit', d:'Tell me what you need next', a:'good' },
   notq:{ ic:'search', t:'Not quite, show me others', d:'Tell me what was missing', a:'notq' },
   newp:{ ic:'search', t:'I’m sourcing something new', d:'Describe it, I’ll match products', a:'new' },
-  cont:{ ic:'search', t:'Continue with electric bicycles', d:'Pick up where we left off', a:'cont' },
+  cont:{ ic:'search', t:'Continue with LED flood lights', d:'Pick up where we left off', a:'cont' },
   fresh:{ ic:'search', t:'Start something new', d:'Describe it, I’ll match products', a:'new' }
 };
 var WEL_FIRST = { h:"Hi, I'm Mica", p:"Your AI Sourcing Guide on Made-in-China.com. Tell me what you're sourcing — the product, quantity, or where you'll use it — and I'll find suppliers that fit.", cards:['find', 'best', 'rfq'] };
 var ID_SHORT = 'Jack_Lee', ID_LONG = 'jack-lee-international-trading-2026';
 function welBack(id, desc, cards){ return { h:'Welcome back, <span class="wid">' + esc(id) + '</span>', p:desc, cards:cards }; }
 var ATTRS = [
-  { name:'Motor power', vals:['Under 500W', '500W–1000W', 'Over 1000W'] },
-  { name:'Battery', vals:['Lithium', 'Lead-acid'] },
-  { name:'Use', vals:['City commute', 'Fat tire / off-road', 'Cargo / 3-wheel'] }
+  { name:'Color Temperature', vals:['3000K', '4000K', '6000K'] },
+  { name:'Power', vals:['100W', '200W', '400W'] },
+  { name:'Waterproof', vals:['IP20', 'IP65', 'IP67'] }
 ];
 var INQ = 'Send inquiry for this product';
 var STD_SUGS = ['Which of these has the lowest MOQ?', 'Do any of them offer free samples?'];
@@ -477,6 +480,7 @@ function send(t){ var a = S.att; S.lastText = t; S.att = null; renderAtt(); buye
 function doSend(){ var t = ta.value.trim(); if ((!t && !S.att) || busy || S.quota || ta.value.length >= 1000) return; ta.value = ''; layout(); send(t); sync(); }
 sendB.addEventListener('click', doSend);
 
+function clampAll(root){ [].slice.call(root.querySelectorAll('.pn')).forEach(function(el){ var full = el.getAttribute('data-full') || el.textContent; el.setAttribute('data-full', full); el.textContent = full; if (el.scrollHeight <= 37) return; var lo = 0, hi = full.length; while (lo < hi) { var mid = Math.ceil((lo + hi) / 2); el.textContent = full.slice(0, mid).replace(/\s+$/, '') + '…'; if (el.scrollHeight <= 37) lo = mid; else hi = mid - 1; } el.textContent = full.slice(0, lo).replace(/\s+$/, '') + '…'; }); }
 function cardEl(p, i, rank){
   var rkHtml = rank ? '<span class="badge g' + rank + '">' + ICONS.medalS + 'TOP' + rank + '</span>' : '';
   var e = mk('div', 'pd' + (rank ? ' rk' : ''), '<div class="im" style="background-image:url(' + p.img + ')"></div><div class="inf">' + rkHtml + '<div class="nm"><div class="pn">' + esc(p.title) + '</div><div class="pr">' + esc(p.price) + '</div></div><div class="mq">' + esc(p.moq) + ' (MOQ)</div></div>');
@@ -514,7 +518,7 @@ async function answer(o){
   var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t); await stream(t, o.intro);
   if (o.cards && o.cards.length) {
     var list = mk('div', 'pl'); inn.appendChild(list);
-    o.cards.forEach(function(p, i){ list.appendChild(cardEl(p, i, o.rank ? i + 1 : 0)); });
+    o.cards.forEach(function(p, i){ list.appendChild(cardEl(p, i, o.rank ? i + 1 : 0)); }); clampAll(list);
     shown = o.cards.slice(); toEnd(); await wait(250 + o.cards.length * 70);
   }
   if (o.extra) await o.extra(inn, m.el);
@@ -537,30 +541,27 @@ function feedback(host, turn){
   });
   return fb;
 }
-var VOCAB = /bik|bicycl|electric|scooter|moped|motor|batter|lithium|tricycle|e-?bike|wheel|tire|tyre|adult|cargo|commut|city|fat|lead/i;
-function pickProducts(text, n){
-  var w = (text.toLowerCase().match(/[a-z]{3,}/g) || []), score = PRODUCTS.map(function(p, i){ var s = 0; w.forEach(function(x){ if (p.title.toLowerCase().indexOf(x) > -1) s += 2; }); return { p:p, s:s - i * 0.01 }; });
-  score.sort(function(a, b){ return b.s - a.s; }); return score.slice(0, n).map(function(x){ return x.p; });
-}
-function moqNum(p){ return parseInt(p.moq, 10) || 9999; }
+var VOCAB = /led|light|lamp|flood|stadium|street|pole|mast|solar|ip\d\d|waterproof|outdoor|parking|lot|garden|yard|court|lumen|watt|\d+w\b/i;
+function pickProducts(text, n){ return ASSIST.slice(0, n); }
+function moqNum(p){ return (parseInt(p.moq, 10) || 9999) + (/Piece/.test(p.moq) ? .5 : 0); }   // 同样是 1，Set 排在 Piece 前面（Figma 657:6812 取的就是 1 Set 那款）
 async function route(text, att){
   var q = (text || '').toLowerCase();
   if (/lowest moq|smallest moq|minimum order/.test(q)) {
-    var src = shown.length ? shown : PRODUCTS.slice(0, 6), best = src.slice().sort(function(a, b){ return moqNum(a) - moqNum(b); })[0];
+    var src = shown.length ? shown : ASSIST, best = src.slice().sort(function(a, b){ return moqNum(a) - moqNum(b); })[0];
     return answer({ intro:'The lowest MOQ among these is ' + esc(best.moq) + ':', cards:[best], steps:['Thinking…', 'Comparing MOQ across the products'] });
   }
   if (/free samples?/.test(q)) {
-    var src2 = shown.length ? shown : PRODUCTS.slice(0, 6), withS = src2.slice(0, 3);
+    var src2 = shown.length ? shown : ASSIST, withS = src2.slice(0, 3);
     return answer({ intro:'These suppliers offer free samples — you may only pay for shipping:', cards:withS, steps:['Thinking…', 'Checking sample policies'], sugs:[STD_SUGS[0]] });
   }
   if (/narrow|specs/.test(q)) return attrsTurn();
   if (/best sell|trending/.test(q)) return startA2(true);
   if (/quotation|rfq|post a request/.test(q)) return rfq();
   if (/^error/.test(q)) return failAnswer(0, /fail/.test(q));
-  if (/quota/.test(q)) { setQuota(true); return; }
-  var noRes = /camera|solar|12v|zzz/.test(q) || (text && text.length > 2 && !VOCAB.test(text) && !att);
+  if (/quota/.test(q)) { setQuota(true, 'guest'); return; }
+  var noRes = /camera|zzz/.test(q) || (text && text.length > 2 && !VOCAB.test(text) && !att);
   if (noRes) return noResult();
-  return answer({ intro:'These match what you described:', cards:pickProducts(text, 6), steps:['Thinking…', 'Understanding: ' + (text || 'your file').slice(0, 40), 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
+  return answer({ intro:/parking lot/i.test(text || '') ? 'For a parking lot, waterproofing is the first thing to check. Here are 6 that fit:' : 'These match what you described:', cards:pickProducts(text, 6), steps:['Thinking…', 'Understanding: ' + (text || 'your file').slice(0, 40), 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
 }
 async function cardAct(a, text){
   if (busy) return; buyerSays(text);
@@ -568,13 +569,13 @@ async function cardAct(a, text){
   if (a === 'best') return startA2(true);
   if (a === 'rfq') return rfq();
   if (a === 'good') return answer({ intro:'Glad to hear that! What are you sourcing next?', steps:['Thinking…'], noFb:true });
-  if (a === 'notq') return answer({ intro:'Sorry about that. Here are some others — tell me what was missing and I’ll narrow it down.', cards:PRODUCTS.slice(3, 9), steps:['Thinking…', 'Finding related products', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
-  if (a === 'cont') return answer({ intro:'Picking up where we left off — these electric bicycles match what you chose last time:', cards:PRODUCTS.slice(0, 6), steps:['Thinking…', 'Recalling your last request', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
+  if (a === 'notq') return answer({ intro:'Sorry about that. Here are some others — tell me what was missing and I’ll narrow it down.', cards:ASSIST, steps:['Thinking…', 'Finding related products', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
+  if (a === 'cont') return answer({ intro:'Picking up where we left off — these LED flood lights match what you chose last time:', cards:ASSIST, steps:['Thinking…', 'Recalling your last request', 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] });
 }
 /* 主动触发：A1 属性选项（内容1）、内容2、A2 榜单 */
 async function startA1(){
   var turn = mk('div', 'turn'); dlg.appendChild(turn);
-  var m = micaRow(turn, 'speak'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  var m = micaRow(turn, 'speak', 'g6'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
   await stream(t, 'The results for “' + esc(QUERY) + '” cover a lot of ground. Let’s narrow them down — which of these matter to you?');
   attrsBox(inn, m); m.set('idle'); toEnd();
 }
@@ -594,19 +595,19 @@ function attrsBox(inn, m){
   go.addEventListener('click', function(){ if (busy || go.disabled) return; var picked = []; Object.keys(sel).forEach(function(n){ picked = picked.concat(sel[n]); }); box.classList.add('lock'); go.style.display = 'none'; buyerSays(picked.join(' · ')); answer({ intro:'Got it. These match what you picked:', cards:pickProducts(picked.join(' '), 6), steps:['Thinking…', 'Understanding: ' + QUERY + ', ' + picked.join(', '), 'Searching and comparing products on Made-in-China.com'], sugs:[STD_SUGS[0]] }); });
 }
 async function startA1b(){
-  var turn = mk('div', 'turn'); dlg.appendChild(turn); var m = micaRow(turn, 'speak'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  var turn = mk('div', 'turn'); dlg.appendChild(turn); var m = micaRow(turn, 'speak', 'g6'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
   await stream(t, 'Tell me everything you need for ' + esc(QUERY) + ' — use, size, quantity, budget — and I’ll find the closest match.'); m.set('idle'); toEnd();
 }
 async function startA2(asReply){
   var turn = asReply ? lastTurn() : mk('div', 'turn'); if (!asReply) dlg.appendChild(turn);
-  var m = micaRow(turn, 'speak'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
-  await stream(t, asReply ? 'Here’s what’s trending for <b>' + esc(QUERY) + '</b>:' : 'Still undecided? Check out what’s trending:');
-  var list = mk('div', 'pl'); inn.appendChild(list); PRODUCTS.slice(0, 3).forEach(function(p, i){ list.appendChild(cardEl(p, i, i + 1)); }); shown = PRODUCTS.slice(0, 3);
+  var m = micaRow(turn, 'speak', asReply ? '' : 'g6'); var inn = bubble(m.el); var t = mk('div', 't'); inn.appendChild(t);
+  await stream(t, asReply ? 'Here’s what’s trending for <b>' + esc(QUERY) + '</b>:' : "Still undecided? Check out what's trending:");
+  var list = mk('div', 'pl'); inn.appendChild(list); ASSIST.slice(0, 3).forEach(function(p, i){ list.appendChild(cardEl(p, i, i + 1)); }); clampAll(list); shown = ASSIST.slice(0, 3);
   m.set('idle'); toEnd();
 }
 /* 没结果 → 发布采购需求（RFQ 表单）；出错；重试仍失败 */
 async function noResult(){
-  return answer({ intro:'I couldn’t find products that match all of that. You can loosen one requirement, or let suppliers come to you with quotes.', steps:['Thinking…', 'Searching and comparing products on Made-in-China.com'], noFb:true, noSugs:true, sugs:['Show electric bicycles instead', 'Show products with fewer requirements'],
+  return answer({ intro:'I couldn’t find products that match all of that. You can loosen one requirement, or let suppliers come to you with quotes.', steps:['Thinking…', 'Searching and comparing products on Made-in-China.com'], noFb:true, noSugs:true, sugs:/camera/i.test(S.lastText) ? ['Show solar flood lights without the camera', 'Show 12V flood lights without solar'] : ['Show LED flood lights instead', 'Show products with fewer requirements'],
     extra:async function(inn){ var b = mk('button', 'pbtn', 'Post a Request for Quotation'); b.type = 'button'; b.addEventListener('click', function(){ if (busy) return; b.disabled = true; buyerSays('Post a Request for Quotation'); rfq(); }); inn.appendChild(b); } });
 }
 async function rfq(){
@@ -654,12 +655,13 @@ async function failAnswer(n, again){
   busy = false; sync(); toEnd();
 }
 /* 额度：游客用完 */
-function setQuota(on){
-  S.quota = on; inp.classList.toggle('quota', on); $('#login').classList.toggle('on', on);
+function setQuota(on, kind){
+  S.quota = on; inp.classList.toggle('quota', on); $('#login').classList.toggle('on', on && kind !== 'user'); ta.style.height = on ? (kind === 'user' ? '72px' : '48px') : '';
   ta.disabled = on; $('#plus').disabled = on || !!S.att; sendB.classList.remove('on');
-  ta.placeholder = on ? 'You have used up your allotted number of conversations, please log in to continue.' : 'Tell Mica what you are looking for…';
+  ta.placeholder = on ? (kind === 'user' ? 'You have reached the limit of 100 conversations in 24 hours. Please try again later.' : 'You have used up your allotted number of conversations, please log in to continue.') : 'Tell Mica what you are looking for…';
+  S.quotaKind = kind;
   if (on) { sendB.style.opacity = '.4'; inp.classList.add('multi'); } else { sendB.style.opacity = ''; }
-  layout(); sync();
+  if (on) { ta.style.height = kind === 'user' ? '72px' : '48px'; } else layout(); sync();
 }
 $('#login').addEventListener('click', function(){ toast('Opens the Log In page in the real site'); });
 
@@ -673,24 +675,25 @@ var SCENES = [
     scn('再次打开 · 问候', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Good to see you again.<br>What are you sourcing today?', ['find', 'best'])); }),
     scn('再次打开 · 买家ID过长', function(){ resetConv(); welcome(welBack(ID_LONG, 'Good to see you again.<br>What are you sourcing today?', ['find', 'best'])); }),
     scn('再次打开 · 问上次的结果', function(){ resetConv(); welcome(welBack(ID_SHORT, 'What are you sourcing today?<br>Were you happy with the products I found for you last time?', ['good', 'notq', 'newp'])); }),
-    scn('再次打开 · 接着上次的采购', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Last time we were looking for electric bicycles.<br>Would you like to pick up where we left off?', ['cont', 'fresh'])); }) ] },
+    scn('再次打开 · 接着上次的采购', function(){ resetConv(); welcome(welBack(ID_SHORT, 'Last time we were looking for LED flood lights.<br>Would you like to pick up where we left off?', ['cont', 'fresh'])); }) ] },
   { g:'主动触发（点提示胶囊后）', items:[
     scn('A1 · 属性选项', function(){ resetConv(); startA1(); }),
     scn('A1 · 内容2', function(){ resetConv(); startA1b(); }),
     scn('A2 · 榜单 TOP3', function(){ resetConv(); startA2(); }) ] },
   { g:'对话', items:[
-    scn('回答完成（6 款 + 追问 + 反馈）', function(){ resetConv(); var t = buyerSays('I need waterproof electric bikes for city commuting, about 200 pieces.'); S.lastText = 'electric bike city commuting'; route('electric bike city commuting'); }),
-    scn('只有 1 款产品', function(){ resetConv(); shown = PRODUCTS.slice(0, 6); buyerSays('Which of these has the lowest MOQ?'); route('Which of these has the lowest MOQ?'); }),
+    scn('回答完成（6 款 + 追问 + 反馈）', function(){ resetConv(); S.lastText = 'I need waterproof LED flood lights for a parking lot, about 50 pieces.'; buyerSays(S.lastText); route(S.lastText); }),
+    scn('只有 1 款产品', function(){ resetConv(); shown = ASSIST; buyerSays('Which of these has the lowest MOQ?'); route('Which of these has the lowest MOQ?'); }),
     scn('没结果 → 发布采购需求', function(){ resetConv(); S.lastText = 'I need a 12V solar-powered LED flood light with a built-in camera, 20 pieces.'; buyerSays(S.lastText); route(S.lastText); }),
     scn('出错 → 重试', function(){ resetConv(); buyerSays('error test'); route('error test'); }),
     scn('出错 → 重试仍失败', function(){ resetConv(); buyerSays('error fail'); route('error fail'); }) ] },
-  { g:'额度', items:[ scn('额度 · 游客用完', function(){ resetConv(); buyerSays('I need waterproof LED flood lights for a parking lot, about 50 pieces.'); setQuota(true); }) ] },
+  { g:'额度', items:[ scn('额度 · 游客用完', function(){ resetConv(); buyerSays('I need waterproof LED flood lights for a parking lot, about 50 pieces.'); setQuota(true, 'guest'); }),
+    scn('额度 · 登录买家用完', function(){ resetConv(); buyerSays('I need waterproof LED flood lights for a parking lot, about 50 pieces.'); setQuota(true, 'user'); }) ] },
   { g:'输入框', items:[
     scn('已选图片', function(){ resetConv(); welcome(WEL_FIRST); typed('', { kind:'img', name:'photo.jpg', size:'860 KB', url:'assets/p1.jpg' }); }),
     scn('已选文件', function(){ resetConv(); welcome(WEL_FIRST); typed('', { kind:'file', name:'Product-spec.pdf', size:'1.2 MB', url:'' }); }),
-    scn('4 行（最高）', function(){ resetConv(); welcome(WEL_FIRST); typed('Waterproof electric bikes for city commuting, about 200 pieces, IP65 or higher, lithium battery, 500W motor, delivery to Los Angeles within 30 days, please quote FOB and CIF.'); }),
-    scn('超过 4 行（框内滚动）', function(){ resetConv(); welcome(WEL_FIRST); typed(new Array(8).join('Waterproof electric bikes for city commuting, about 200 pieces, IP65 or higher. ')); }),
-    scn('打满 1000 字', function(){ resetConv(); welcome(WEL_FIRST); var s = ''; while (s.length < 1000) s += 'Waterproof electric bike for city commuting, about 200 pieces. '; typed(s.slice(0, 1000)); }),
+    scn('4 行（最高）', function(){ resetConv(); welcome(WEL_FIRST); typed('Waterproof LED flood lights for a parking lot, about 50 pieces, IP65 or higher, 4000K, 200W, delivery to Los Angeles within 30 days, please quote FOB and CIF.'); }),
+    scn('超过 4 行（框内滚动）', function(){ resetConv(); welcome(WEL_FIRST); typed(new Array(8).join('Waterproof LED flood lights for a parking lot, about 50 pieces, IP65 or higher. ')); }),
+    scn('打满 1000 字', function(){ resetConv(); welcome(WEL_FIRST); var s = ''; while (s.length < 1000) s += 'Waterproof LED flood lights for a parking lot, about 50 pieces. '; typed(s.slice(0, 1000)); }),
     scn('上传失败 · 超过 5MB', function(){ resetConv(); welcome(WEL_FIRST); toast('File is too large (max 5MB)'); }),
     scn('上传失败 · 格式不支持', function(){ resetConv(); welcome(WEL_FIRST); toast('Unsupported file type'); }) ] }
 ];
